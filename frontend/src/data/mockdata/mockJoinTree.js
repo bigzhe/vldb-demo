@@ -1,10 +1,9 @@
-{
+export const mockJoinTree = {
 	"relations": [
 		{"name" : "Inventory"},
 		{"name" : "Stores"},
 		{"name" : "Weather"},
-		{"name" : "Items"},
-		// {"name" : "Demographics"}
+		{"name" : "Items"}
 	],
 	"edges": [
 		{
@@ -48,7 +47,8 @@
 		{"V7" : "V7(store, SUM(1))"}, 
 		{"V8" : "V8(store, SUM(1))"}, 
 		{"V9" : "V9(item,  SUM(1))"}, 
-		{"V10" : "V10(item, type,  SUM(1))"}, 
-		{"V11" : "V11(date, store,  SUM(1))"}
+		{"V10" : "V10(item, type, SUM(1))"}, 
+		{"V11" : "V11(date, store, SUM(1))"}
 	]
 }
+
