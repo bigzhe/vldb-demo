@@ -9,30 +9,16 @@
     </Tabs>
     <br />
 
-    <Dataset ref="dataset"></Dataset>
-    <!-- <ModelSelection ref="modelSelection" v-if="tab == 'modelSelection'"></ModelSelection>
-    <Regression ref="regression" v-else-if="tab == 'regression'"></Regression>
-    <ChowLiuTree ref="clt" v-else-if="tab == 'clt'"></ChowLiuTree>
-    <StaticStrategy ref="strategy" v-else-if="tab == 'strategy'"></StaticStrategy>
-    <Dataset ref="dataset" v-else-if="tab == 'dataset'"></Dataset> -->
+    <ViewGeneration ref="viewGeneration" v-if="tab == 'viewGeneration'"></ViewGeneration>
+    <Dataset ref="dataset" v-else-if="tab == 'dataset'"></Dataset>
 
-    <br />
-    <br />
-
-    <!-- <BackTop :height="0" :bottom="20" :right="20">
-        <div @click="nextBatch" class="top">Process Updates</div>
-    </BackTop>-->
   </div>
 </template>
 
 <script>
 import Dataset from "../components/Dataset.vue";
-// import ChowLiuTree from "../components/ChowLiuTree";
-// import ComputationalModel from "../components/ComputationalModel";
-// import ModelSelection from "../components/ModelSelection";
-// import Regression from "../components/Regression";
-// import StaticStrategy from "../components/StaticStrategy";
-// import About from "../components/About";
+import ViewGeneration from "../components/ViewGeneration";
+
 
 export default {
   name: "home",
@@ -46,17 +32,13 @@ export default {
   },
   components: {
     Dataset,
-    // StaticStrategy,
-    // ModelSelection,
-    // ChowLiuTree,
-    // Regression,
+    ViewGeneration,
   },
   mounted: function() {
 
   },
   methods: {
     handleClick(newTab) {
-      // console.log(newTab)
       this.$store.commit("SET_TAB", newTab);
     },
   },
