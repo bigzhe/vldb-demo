@@ -1,0 +1,113 @@
+import { ModelElement, ModelMatrix, ModelScalar, FlatMIElement } from "../types/Model"
+
+import dataset from './dataset'
+import fp from 'lodash/fp'
+import _ from 'lodash'
+import { RelationInfo } from '@/types/Query'
+
+
+const RetailerDatset = dataset.find(d => d.name == "Retailer")
+// const variables: string[] = fp.union(RetailerDatset?.relations.flatMap(r => r.variables))
+export const variables: string[] = fp.isNil(RetailerDatset) ? [] : _.uniq(RetailerDatset.relations
+  .filter((r: RelationInfo) => !fp.isNil(r.variables))
+  .flatMap((r: RelationInfo) => r.variables))
+
+const generateModelElement = function (attrX: string, attrY: string): ModelElement {
+  let dimension = fp.random(0, 2);
+
+  const getMatrixScalar = function (xValue: string, yValue: string): ModelScalar {
+    return {
+      xValue,
+      yValue,
+      COVAR: fp.random(1000, true)
+    }
+  }
+
+  const MI = attrX == attrY ? 1 : fp.random(0.7, true)
+  if (dimension == 0) {
+    return {
+      attrX,
+      attrY,
+      MI,
+      dimension,
+      matrix: [[getMatrixScalar(attrX, attrY)]]
+    }
+  } else if (dimension == 1) {
+    return {
+      attrX,
+      attrY,
+      MI,
+      dimension,
+      matrix: [_.range(5).map(i => {
+        return getMatrixScalar(`Cat_${i}`, attrY)
+      })]
+    }
+  } else {
+    return {
+      attrX,
+      attrY,
+      MI,
+      dimension,
+      matrix: _.range(5).map(i => {
+        return _.range(5).map(j => {
+          return getMatrixScalar(`Cat_${i}`, `Cat_${j}`)
+        })
+      })
+    }
+  }
+}
+
+const visitedEdges: { [_: string]: { [_: string]: ModelElement } } = {}
+variables.forEach(v => {
+  visitedEdges[v] = {}
+})
+variables.forEach(v1 => {
+  variables.forEach(v2 => {
+    const elem = generateModelElement(v1, v2)
+    visitedEdges[v1][v2] = elem
+    visitedEdges[v2][v1] = {
+      ...elem,
+      attrX: elem.attrY,
+      attrY: elem.attrX,
+    }
+  })
+})
+
+// some fake matrix
+export const RetailerMatrix_: ModelMatrix = fp.isNil(variables) ? [[]] : variables.map(varX => {
+  return variables.map(varY => {
+    // console.log({varX, varY, elem: visitedEdges[varX][varY]})
+    return visitedEdges[varX][varY]
+  })
+})
+
+export const RetailerMatrix2: ModelMatrix = fp.isNil(variables) ? [[]] : variables.map(varX => {
+  return variables.map(varY => {
+    const elem = generateModelElement(varX, varY)
+    return elem
+  })
+})
+
+// console.log(RetailerMatrix)
+
+export const getMIFlatArray = function (): FlatMIElement[] {
+  return RetailerMatrix.flat()
+}
+
+export const getModelSelectionArray = function (label: string): FlatMIElement[] {
+  const labelIndex = variables.findIndex(v => v == label)
+  console.assert(labelIndex !== -1)
+  return RetailerMatrix[labelIndex].sort((a, b) => a.MI - b.MI)
+}
+
+
+
+export const getCovArray = function (features: string[]): FlatMIElement[] {
+  return RetailerMatrix.filter(col => features.includes(col[0].attrX)).flat().filter(x => features.includes(x.attrY))
+}
+
+export const getLinearRegressionArray = function (features: string[], label: string): FlatMIElement[] {
+  const labelIndex = variables.findIndex(v => v == label)
+  console.assert(labelIndex !== -1)
+  return RetailerMatrix[labelIndex].filter(x => features.includes(x.attrY))
+}
