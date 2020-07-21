@@ -43,22 +43,14 @@ export default function showJoinTree(graph, id) {
     .enter().append("svg:marker") // This section adds in the arrows
     .attr("id", String)
     .attr("viewBox", "0 -5 10 10")
-    .attr("refX", 15)
+    .attr("refX", 48)
     .attr("refY", 0)
     .attr("markerWidth", 8)
     .attr("markerHeight", 8)
     .attr("orient", "auto")
     .append("svg:path")
     .attr("d", "M0,-5L10,0L0,5");
-    
-    // .attr("viewBox", "0 -5 10 10")
-    // .attr("refX", 15)
-    // .attr("refY", -1.5)
-    // .attr("markerWidth", 6)
-    // .attr("markerHeight", 6)
-    // .attr("orient", "auto")
-    // .append("svg:path")
-    // .attr("d", "M0,-5L10,0L0,5");
+
 
   var color = d3.scaleOrdinal(d3.schemeCategory20);
 
@@ -66,7 +58,7 @@ export default function showJoinTree(graph, id) {
     .force("link", d3.forceLink().id(function (d) {
       return d.id;
     }))
-    .force("charge", d3.forceManyBody().strength(-1500))
+    .force("charge", d3.forceManyBody().strength(-10000))
     .force("center", d3.forceCenter(width / 2, height / 2));
 
   prepareLinks()
@@ -91,22 +83,21 @@ export default function showJoinTree(graph, id) {
 
   var circles = node.append("circle")
     .attr("r", function (d) {
-      return 5
+      return 30
     })
-    .attr("fill", function (d) {
-      return d.r ? 'red' : color(d.group);
-    })
+    .style("stroke", "red") // set the line colour
+    .style("fill", "white")
+
     .call(d3.drag()
       .on("start", dragstarted)
       .on("drag", dragged)
       .on("end", dragended));
 
-  var lables = node.append("text")
-    .text(function (d) {
-      return d.id;
-    })
-    .attr('x', 8)
-    .attr('y', 4);
+  node.append('text')
+    .attr('text-anchor', 'middle')
+    .attr('alignment-baseline', 'middle')
+    .style('font-size', d => d.radius * 0.4 + 'px')
+    .text(d => d.id)
 
   node.append("title")
     .text(function (d) {
@@ -121,7 +112,6 @@ export default function showJoinTree(graph, id) {
     .links(graph.links);
 
   function ticked() {
-
 
     link
       .attr("x1", function (d) {
@@ -142,7 +132,7 @@ export default function showJoinTree(graph, id) {
         var translation = calcTranslationExact(rightwardSign * 4, d.source, d.target);
         // console.log({translation})
         return `translate (${translation.dx}, ${translation.dy})`;
-      });
+      })
 
     node
       .attr("transform", function (d) {
