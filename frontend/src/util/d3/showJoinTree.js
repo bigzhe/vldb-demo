@@ -1,8 +1,11 @@
 import * as d3 from "d3v4"
 
 const LINK_WIDTH = 20;
+const NODE_RADIUS = 30;
 
 export default function showJoinTree(graph, id) {
+
+
 
   // compute the clt 
   let width = document.getElementById(id).getBoundingClientRect().width - 22
@@ -115,20 +118,21 @@ export default function showJoinTree(graph, id) {
 
 
   // the functions for computing the point that a link intersects the circle it points to
-  var nodeRadius = 30;
+  
   var lineX2 = function (d) {
       var length = Math.sqrt(Math.pow(d.target.y - d.source.y, 2) + Math.pow(d.target.x - d.source.x, 2));
-      var scale = (length - nodeRadius) / length;
+      var scale = (length - NODE_RADIUS) / length;
       var offset = (d.target.x - d.source.x) - (d.target.x - d.source.x) * scale;
       return d.target.x - offset;
   };
   var lineY2 = function (d) {
       var length = Math.sqrt(Math.pow(d.target.y - d.source.y, 2) + Math.pow(d.target.x - d.source.x, 2));
-      var scale = (length - nodeRadius) / length;
+      var scale = (length - NODE_RADIUS) / length;
       var offset = (d.target.y - d.source.y) - (d.target.y - d.source.y) * scale;
       return d.target.y - offset;
   };
 
+  // 
   function ticked() {
 
     link
@@ -141,10 +145,10 @@ export default function showJoinTree(graph, id) {
       .attr("x2", lineX2)
       .attr("y2", lineY2)
       .attr('transform', function (d) {
-
+        
+        // add shifts to the parallel lines
         var rightwardSign = d.target.x > d.source.x ? 1 : -1;
         var translation = calcTranslationExact(rightwardSign * 4, d.source, d.target);
-        // console.log({translation})
         return `translate (${translation.dx}, ${translation.dy})`;
       })
 
