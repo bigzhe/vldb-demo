@@ -42,14 +42,14 @@ export default function showJoinTree(graph, id) {
     .data(["end"]) // Different link/path types can be defined here
     .enter().append("svg:marker") // This section adds in the arrows
     .attr("id", String)
-    .attr("refX", 6)
-    .attr("refY", 6)
-    .attr("markerWidth", 10)
-    .attr("markerHeight", 10)
+    .attr("viewBox", "0 -5 10 10")
+    .attr("refX", 15)
+    .attr("refY", 0)
+    .attr("markerWidth", 8)
+    .attr("markerHeight", 8)
     .attr("orient", "auto")
-    .append("path")
-    .attr("d", "M 0 0 12 6 0 12 3 6")
-    .style("fill", "black");
+    .append("svg:path")
+    .attr("d", "M0,-5L10,0L0,5");
     
     // .attr("viewBox", "0 -5 10 10")
     // .attr("refX", 15)
@@ -121,35 +121,7 @@ export default function showJoinTree(graph, id) {
     .links(graph.links);
 
   function ticked() {
-    //   link.attr("d", function(d) {
-    //     var dx = d.target.x - d.source.x,
-    //         dy = d.target.y - d.source.y,
-    //         dr = Math.sqrt(dx * dx + dy * dy);
-    //    /* return "M" + 
-    //         d.source.x + "," + 
-    //         d.source.y + "A" + 
-    //         dr + "," + dr + " 0 0,1 " + 
-    //         d.target.x + "," + 
-    //         d.target.y; */
 
-    //     const conincidentLines = false;
-    //     if (conincidentLines) {
-    //       return "M" + 
-    //         d.source.x + "," + 
-    //         d.source.y + "L" + 
-    //         d.target.x + "," + 
-    //         d.target.y;
-    //     }
-    //     else {
-    //       var delta = calcTranslationExact(4, d.source, d.target);
-    //       var rightwardSign = d.target.x > d.source.x ? 1 : -1;
-    //       return "M" + 
-    //           (d.source.x + rightwardSign * delta.dx) + "," + 
-    //           (d.source.y + (-rightwardSign * delta.dy)) + "L" + 
-    //           (d.target.x + rightwardSign * delta.dx) + "," + 
-    //           (d.target.y + (-rightwardSign * delta.dy));
-    //     }
-    // });
 
     link
       .attr("x1", function (d) {
