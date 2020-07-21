@@ -44,7 +44,7 @@ export default class Dataset extends Vue {
   // }
 
   mounted() {
-
+    console.log(joinTreeD3)
     this.renderD3();
     console.log(joinTreeD3)
   }

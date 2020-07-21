@@ -6,9 +6,6 @@ import {
 
 // get the join tree json
 const joinTreeD3 = {
-  "directed": true,
-  "multigraph": false,
-  "graph": {},
   nodes: mockJoinTree.relations.map(relation => {
     return {id: relation.name}
   }),

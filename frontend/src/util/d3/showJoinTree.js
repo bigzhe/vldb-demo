@@ -1,5 +1,7 @@
 import * as d3 from "d3v4"
 
+const LINK_WIDTH = 20;
+
 export default function showJoinTree(graph, id) {
 
   // compute the clt 
@@ -9,6 +11,8 @@ export default function showJoinTree(graph, id) {
   // height /= 2
 
   d3.select(`#${id}`).select('svg').remove()
+
+
 
   var root = d3.select(`#${id}`)
     .append("svg")
@@ -33,6 +37,28 @@ export default function showJoinTree(graph, id) {
     svg.attr("transform", d3.event.transform);
   }
 
+  // build the arrow.
+  svg.append("svg:defs").selectAll("marker")
+    .data(["end"]) // Different link/path types can be defined here
+    .enter().append("svg:marker") // This section adds in the arrows
+    .attr("id", String)
+    .attr("refX", 6)
+    .attr("refY", 6)
+    .attr("markerWidth", 10)
+    .attr("markerHeight", 10)
+    .attr("orient", "auto")
+    .append("path")
+    .attr("d", "M 0 0 12 6 0 12 3 6")
+    .style("fill", "black");
+    
+    // .attr("viewBox", "0 -5 10 10")
+    // .attr("refX", 15)
+    // .attr("refY", -1.5)
+    // .attr("markerWidth", 6)
+    // .attr("markerHeight", 6)
+    // .attr("orient", "auto")
+    // .append("svg:path")
+    // .attr("d", "M0,-5L10,0L0,5");
 
   var color = d3.scaleOrdinal(d3.schemeCategory20);
 
@@ -40,8 +66,10 @@ export default function showJoinTree(graph, id) {
     .force("link", d3.forceLink().id(function (d) {
       return d.id;
     }))
-    .force("charge", d3.forceManyBody())
+    .force("charge", d3.forceManyBody().strength(-1500))
     .force("center", d3.forceCenter(width / 2, height / 2));
+
+  prepareLinks()
 
   var link = svg.append("g")
     .attr("class", "links")
@@ -50,7 +78,10 @@ export default function showJoinTree(graph, id) {
     .enter().append("line")
     .attr("stroke-width", function (d) {
       return 1;
-    });
+    })
+    .attr("marker-end", "url(#end)");
+
+
 
   var node = svg.append("g")
     .attr("class", "nodes")
@@ -74,8 +105,8 @@ export default function showJoinTree(graph, id) {
     .text(function (d) {
       return d.id;
     })
-    .attr('x', 6)
-    .attr('y', 3);
+    .attr('x', 8)
+    .attr('y', 4);
 
   node.append("title")
     .text(function (d) {
@@ -90,6 +121,36 @@ export default function showJoinTree(graph, id) {
     .links(graph.links);
 
   function ticked() {
+    //   link.attr("d", function(d) {
+    //     var dx = d.target.x - d.source.x,
+    //         dy = d.target.y - d.source.y,
+    //         dr = Math.sqrt(dx * dx + dy * dy);
+    //    /* return "M" + 
+    //         d.source.x + "," + 
+    //         d.source.y + "A" + 
+    //         dr + "," + dr + " 0 0,1 " + 
+    //         d.target.x + "," + 
+    //         d.target.y; */
+
+    //     const conincidentLines = false;
+    //     if (conincidentLines) {
+    //       return "M" + 
+    //         d.source.x + "," + 
+    //         d.source.y + "L" + 
+    //         d.target.x + "," + 
+    //         d.target.y;
+    //     }
+    //     else {
+    //       var delta = calcTranslationExact(4, d.source, d.target);
+    //       var rightwardSign = d.target.x > d.source.x ? 1 : -1;
+    //       return "M" + 
+    //           (d.source.x + rightwardSign * delta.dx) + "," + 
+    //           (d.source.y + (-rightwardSign * delta.dy)) + "L" + 
+    //           (d.target.x + rightwardSign * delta.dx) + "," + 
+    //           (d.target.y + (-rightwardSign * delta.dy));
+    //     }
+    // });
+
     link
       .attr("x1", function (d) {
         return d.source.x;
@@ -102,12 +163,55 @@ export default function showJoinTree(graph, id) {
       })
       .attr("y2", function (d) {
         return d.target.y;
+      })
+      .attr('transform', function (d) {
+
+        var rightwardSign = d.target.x > d.source.x ? 1 : -1;
+        var translation = calcTranslationExact(rightwardSign * 4, d.source, d.target);
+        // console.log({translation})
+        return `translate (${translation.dx}, ${translation.dy})`;
       });
 
     node
       .attr("transform", function (d) {
         return "translate(" + d.x + "," + d.y + ")";
       })
+  }
+
+  function calcTranslationExact(targetDistance, point0, point1) {
+    var x1_x0 = point1.x - point0.x,
+      y1_y0 = point1.y - point0.y,
+      x2_x0, y2_y0;
+    if (y1_y0 === 0) {
+      x2_x0 = 0;
+      y2_y0 = targetDistance;
+    } else {
+      var angle = Math.atan((x1_x0) / (y1_y0));
+      x2_x0 = -targetDistance * Math.cos(angle);
+      y2_y0 = targetDistance * Math.sin(angle);
+    }
+    return {
+      dx: x2_x0,
+      dy: y2_y0
+    };
+  }
+
+  function prepareLinks() {
+    var linksFromNodes = {};
+    graph.links.forEach(function (val, idx) {
+      var sid = val.source,
+        tid = val.targetID,
+        key = (sid < tid ? sid + "," + tid : tid + "," + sid);
+      if (linksFromNodes[key] === undefined) {
+        linksFromNodes[key] = [idx];
+        val.multiIdx = 1;
+      } else {
+        val.multiIdx = linksFromNodes[key].push(idx);
+      }
+      // Calculate target link distance, from the index in the multiple-links array:
+      // 1 -> 0, 2 -> 2, 3-> -2, 4 -> 4, 5 -> -4, ...
+      val.targetDistance = (val.multiIdx % 2 === 0 ? val.multiIdx * LINK_WIDTH : (-val.multiIdx + 1) * LINK_WIDTH);
+    });
   }
 
   function dragstarted(d) {
