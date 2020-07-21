@@ -8,11 +8,21 @@
     <Row :gutter="20">
       <Col span="12">
         <h4>Output Queries</h4>
-        <div style="border: 1px solid gray" id="outputQueries"></div>
+        <div style="border: 1px solid gray">
+          {{selectedRelation}}
+        </div>
       </Col>
       <Col span="12">
         <h4>Intermediate Views</h4>
-        <div style="border: 1px solid gray" id="intermediateViews"></div>
+        <div style="border: 1px solid gray; padding: 5px">
+          <div v-if="selectedEdge.source">
+            <h5>{{selectedEdge.source}} to {{selectedEdge.target}}</h5>
+            <hr style="margin-top: 5px; margin-bottom: 5px;">
+            <p :key="i" v-for="(view,i) in selectedEdge.views">
+              {{joinTreeD3.views[view]}}
+            </p>
+          </div>
+        </div>
       </Col>
     </Row>
   </div>
@@ -27,35 +37,36 @@ import { joinTreeD3 } from "../data/joinTree";
 // import the visualization function -- d3 
 import showJoinTree from "../util/d3/showJoinTree"
 
-// import { ModelMatrix } from "../types/Model";
-
-// import showCovMatrix from "../util/d3/showCovMatrix";
-// import showLinearRegression from "../util/d3/showLinearRegression";
+const dumbEdge = {
+    source: "",
+    target: "",
+    views: [],
+  }
 
 @Component({})
 export default class Dataset extends Vue {
   // data
-  // predictInput: number[] = [];
-  // predictResult: string = "";
-  // truthResult: string = "";
-
-  // get label(): string {
-  //   return this.$store.state.label;
-  // }
+  selectedRelation: string = ""
+  selectedEdge: {source: string, target: string, views: string[]} = dumbEdge
+  joinTreeD3 = joinTreeD3
 
   mounted() {
-    console.log(joinTreeD3)
     this.renderD3();
     console.log(joinTreeD3)
   }
 
-  renderD3() {
-    showJoinTree(joinTreeD3, 'joinTree')
-    // showCovMatrix(
-    //   [...this.features, this.label],
-    //   getCovArray(this.matrix, [...this.features, this.label])
-    // );
+  relationClicked(relationId: string) {
+    console.log({relationId})
+    this.selectedRelation = relationId
+  }
 
+  transitionClicked(source: string, target: string) {
+    this.selectedEdge = joinTreeD3.links.find(edge => edge.source == source && edge.target == target) || dumbEdge
+    console.log(this.selectedEdge)
+  }
+
+  renderD3() {
+    showJoinTree(joinTreeD3, 'joinTree', this.transitionClicked, this.relationClicked)
   }
 
 }

@@ -3,13 +3,13 @@ import * as d3 from "d3v4"
 const LINK_WIDTH = 20;
 const NODE_RADIUS = 30;
 
-export default function showJoinTree(graph, id) {
+export default function showJoinTree(originGraph, id, clickLinkCallBack, clickNodeCallBack) {
 
-
+  const graph = JSON.parse(JSON.stringify(originGraph)) // deep copy
 
   // compute the clt 
   let width = document.getElementById(id).getBoundingClientRect().width - 22
-  let height = (window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight) - 270
+  let height = (window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight) - 300
 
   // height /= 2
 
@@ -76,7 +76,11 @@ export default function showJoinTree(graph, id) {
     .attr("stroke-width", function (d) {
       return d.weight;
     })
-    .attr("marker-end", "url(#end)");
+    .attr("marker-end", "url(#end)")
+    .on("click", function(d) {
+      // console.log(d.source.id, d.target.id)
+      clickLinkCallBack(d.source.id, d.target.id)
+    })
 
 
 
@@ -85,6 +89,7 @@ export default function showJoinTree(graph, id) {
     .selectAll("g")
     .data(graph.nodes)
     .enter().append("g")
+    
 
   var circles = node.append("circle")
     .attr("r", function (d) {
@@ -92,11 +97,14 @@ export default function showJoinTree(graph, id) {
     })
     .style("stroke", "red") // set the line colour
     .style("fill", "white")
-
     .call(d3.drag()
       .on("start", dragstarted)
       .on("drag", dragged)
-      .on("end", dragended));
+      .on("end", dragended))
+    .on("click", function(d) {
+        // console.log(d.id)
+        clickNodeCallBack(d.id)
+      })
 
   node.append('text')
     .attr('text-anchor', 'middle')

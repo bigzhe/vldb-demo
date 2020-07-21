@@ -12,10 +12,12 @@ const joinTreeD3 = {
   links: mockJoinTree.edges.map(edge => {
     return {
       weight: edge.views.length, 
+      views: edge.views,
       source: edge.origin,
       target: edge.dest,
     }
-  })
+  }),
+  views: mockJoinTree.views,
 }
 
 export {
