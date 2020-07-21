@@ -42,14 +42,16 @@ export default function showJoinTree(graph, id) {
     .data(["end"]) // Different link/path types can be defined here
     .enter().append("svg:marker") // This section adds in the arrows
     .attr("id", String)
-    .attr("viewBox", "0 -5 10 10")
-    .attr("refX", 48)
-    .attr("refY", 0)
-    .attr("markerWidth", 8)
-    .attr("markerHeight", 8)
+    .attr("viewBox", "0 0 10 10")
+    .attr("refX", "10")
+    .attr("refY", "5")
+    .attr("markerUnits", "strokeWidth")
+    .attr("markerWidth", "10")
+    .attr("markerHeight", "5")
     .attr("orient", "auto")
     .append("svg:path")
-    .attr("d", "M0,-5L10,0L0,5");
+    .attr("d", "M 0 0 L 10 5 L 0 10 z")
+    .attr("fill", "#000");
 
 
   var color = d3.scaleOrdinal(d3.schemeCategory20);
@@ -69,7 +71,7 @@ export default function showJoinTree(graph, id) {
     .data(graph.links)
     .enter().append("line")
     .attr("stroke-width", function (d) {
-      return 1;
+      return d.weight;
     })
     .attr("marker-end", "url(#end)");
 
@@ -111,6 +113,22 @@ export default function showJoinTree(graph, id) {
   simulation.force("link")
     .links(graph.links);
 
+
+  // the functions for computing the point that a link intersects the circle it points to
+  var nodeRadius = 30;
+  var lineX2 = function (d) {
+      var length = Math.sqrt(Math.pow(d.target.y - d.source.y, 2) + Math.pow(d.target.x - d.source.x, 2));
+      var scale = (length - nodeRadius) / length;
+      var offset = (d.target.x - d.source.x) - (d.target.x - d.source.x) * scale;
+      return d.target.x - offset;
+  };
+  var lineY2 = function (d) {
+      var length = Math.sqrt(Math.pow(d.target.y - d.source.y, 2) + Math.pow(d.target.x - d.source.x, 2));
+      var scale = (length - nodeRadius) / length;
+      var offset = (d.target.y - d.source.y) - (d.target.y - d.source.y) * scale;
+      return d.target.y - offset;
+  };
+
   function ticked() {
 
     link
@@ -120,12 +138,8 @@ export default function showJoinTree(graph, id) {
       .attr("y1", function (d) {
         return d.source.y;
       })
-      .attr("x2", function (d) {
-        return d.target.x;
-      })
-      .attr("y2", function (d) {
-        return d.target.y;
-      })
+      .attr("x2", lineX2)
+      .attr("y2", lineY2)
       .attr('transform', function (d) {
 
         var rightwardSign = d.target.x > d.source.x ? 1 : -1;
