@@ -1,4 +1,4 @@
 # vldb-demo
 VLDB Demo
 
-a
+Check the demo page at https://bigzhe.github.io/vldb-demo/.
