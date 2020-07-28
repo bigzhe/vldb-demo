@@ -1,0 +1,103 @@
+#include <stdio.h>
+#include <string.h>
+// #include "mongoose.h"
+
+#include <iostream>
+#include <sstream>
+#include <algorithm>
+
+// #include "application/application.hpp"
+#include "LMFAO.hpp"
+#include "../mongoose/mongoose.h"
+
+LMFAO app;
+
+static const char *s_http_port = "8081";
+// static struct mg_serve_http_opts s_http_server_opts;
+
+static void ev_handler(struct mg_connection *c, int ev, void *p) {
+  if (ev == MG_EV_HTTP_REQUEST) {
+
+    struct http_message *hm = (struct http_message *) p;
+
+    std::string uri (hm->uri.p, (int)hm->uri.len);
+    // std::cout << uri << std::endl; 
+
+    std::string returnMsg = app.process_next_batch(uri); 
+
+    // We have received an HTTP request. Parsed request is contained in `hm`.
+    // Send HTTP reply to the client which shows full original request.
+    mg_send_head(c, 200, returnMsg.length(), "Content-Type: text/plain");
+    mg_printf(c, "%s", returnMsg.c_str());
+  }
+}
+
+static void regenViews_handler(struct mg_connection *c, int ev, void *p) {
+  if (ev == MG_EV_HTTP_REQUEST) {
+
+    struct http_message *hm = (struct http_message *) p;
+
+    std::string uri (hm->uri.p, (int)hm->uri.len);
+    
+    std::string returnMsg = app.regenerateViews(uri); 
+
+    // We have received an HTTP request. Parsed request is contained in `hm`.
+    // Send HTTP reply to the client which shows full original request.
+    mg_send_head(c, 200, returnMsg.length(), "Content-Type: text/plain");
+    mg_printf(c, "%s", returnMsg.c_str());
+  }
+}
+
+int main(void) {
+
+  app.launch_server();
+
+  struct mg_mgr mgr;
+  struct mg_connection *nc;
+
+  mg_mgr_init(&mgr, NULL);
+
+  printf("Starting web server on port %s\n", s_http_port);
+
+  nc = mg_bind(&mgr, s_http_port, regenViews_handler);
+  
+  if (nc == NULL) {
+    printf("Failed to create listener\n");
+    return 1;
+  }
+
+  // Set up HTTP server parameters
+  mg_set_protocol_http_websocket(nc);
+
+  // s_http_server_opts.document_root = ".";  // Serve current directory
+  // s_http_server_opts.enable_directory_listing = "yes";
+
+  // Serve request. Hit Ctrl-C to terminate the program
+  for (;;) {
+    mg_mgr_poll(&mgr, 1000);
+  }
+
+  mg_mgr_free(&mgr);
+
+  return 0;
+
+  /*  
+  struct mg_server *server;
+
+  // Create and configure the mgr
+  server = mg_create_server(NULL);
+  mg_set_option(server, "listening_port", "8081");
+  mg_add_uri_handler(server, "/", index_html);
+
+  // Serve request. Hit Ctrl-C to terminate the program
+  printf("Starting on port %s\n", mg_get_option(server, "listening_port"));
+  for (;;) {
+    mg_poll_server(server, 1000);
+  }
+
+  // Cleanup, and free server instance
+  mg_destroy_server(&server);
+
+  return 0;
+  */
+}
