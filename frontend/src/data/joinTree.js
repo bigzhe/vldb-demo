@@ -49,6 +49,7 @@ const joinTreeD3 = {
       ...query,
       title: `${query.name}`,
       expand: false,
+      contextmenu: true,
       children: [
         {
           title: `Group By Variables`,
