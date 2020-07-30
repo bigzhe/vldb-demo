@@ -9,7 +9,8 @@
       <Col span="12">
         <h4>Output Queries</h4>
         <div style="border: 1px solid gray; padding: 5px">
-          <div :key="relation.id" v-for="relation in joinTreeD3.relations">
+          <p>Right-click the queries to change their root</p>
+          <div style="margin-top: 5px" :key="relation.id" v-for="relation in joinTreeD3.relations">
             <h5>{{relation.name}}</h5>
             <hr style="margin-top: 5px; margin-bottom: 5px;" />
             <Tree :data="outputQueries[relation.name]" @on-contextmenu="handleContextMenu">
@@ -28,7 +29,7 @@
             <hr style="margin-top: 5px; margin-bottom: 5px;" />
             <Tree :data="intermediateViews"></Tree>
           </div>
-          <div v-else>Click the arrows to inspect the intermediate views along the</div>
+          <div v-else>Click the arrows to inspect the intermediate views</div>
         </div>
       </Col>
     </Row>
