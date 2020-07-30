@@ -64,7 +64,23 @@ export default new Vuex.Store({
     },
   },
   actions: {
+    regenerateViews({
+      state,
+      commit
+    }, {rootIndicators, onSuccess}) {
 
+      // await axios.get
+      // returns a Promise
+      return axios({
+        method: 'get',
+        url: ` http://localhost:8081/regen/[${rootIndicators.join(',')}]`
+      }).then(function (response) {
+          console.log(response)
+          onSuccess()
+      }).catch(err => {
+        console.log(err);
+      });
+    }
   },
   modules: {}
 })

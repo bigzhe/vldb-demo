@@ -15,7 +15,11 @@
             <hr style="margin-top: 5px; margin-bottom: 5px;" />
             <Tree :data="outputQueries[relation.name]" @on-contextmenu="handleContextMenu">
               <template slot="contextMenu">
-                <DropdownItem :key="relation.id" v-for="relation in joinTreeD3.relations" @click.native="changeRoot(relation.name)">{{relation.name}}</DropdownItem>
+                <DropdownItem
+                  :key="relation.id"
+                  v-for="relation in joinTreeD3.relations"
+                  @click.native="changeRoot(relation.name)"
+                >{{relation.name}}</DropdownItem>
               </template>
             </Tree>
           </div>
@@ -31,6 +35,15 @@
           </div>
           <div v-else>Click the arrows to inspect the intermediate views</div>
         </div>
+      </Col>
+    </Row>
+    <br />
+    <Row style="margin-bottom: 10px;" :gutter="20">
+      <Col span="12">
+        <Button @click="regenerateViews" type="primary">Regenerate Views</Button>
+      </Col>
+      <Col span="12">
+        <Button type="primary">Group Views</Button>
       </Col>
     </Row>
   </div>
@@ -59,11 +72,10 @@ export default class Dataset extends Vue {
   selectedRelation: string = "";
   selectedEdge: { source: string; target: string; views: string[] } = dumbEdge;
   joinTreeD3 = joinTreeD3;
-  contextData: any = {}
+  contextData: any = {};
 
   mounted() {
     this.renderD3();
-    console.log(joinTreeD3);
   }
 
   get intermediateViews() {
@@ -74,6 +86,27 @@ export default class Dataset extends Vue {
 
   get outputQueries() {
     return _.groupBy(joinTreeD3.queries, "root");
+  }
+
+  // http://localhost:8081/regen/[0,1,2,1,3,4,4,3]
+  regenerateViews() {
+    const rootIndicators = this.joinTreeD3.queries.map((query) => {
+      const root = query.root;
+      const idx = this.joinTreeD3.relations.findIndex((r) => r.name == root);
+      return idx === -1 ? -1 : this.joinTreeD3.relations[idx].id;
+    });
+
+    console.log(
+      `Sending request http://localhost:8081/regen/${rootIndicators}`
+    );
+
+    this.$store.dispatch("regenerateViews", {
+      rootIndicators,
+      onSuccess: function () {
+        // on success
+        console.log("request sent");
+      },
+    });
   }
 
   relationClicked(relationId: string) {
@@ -89,24 +122,24 @@ export default class Dataset extends Vue {
     console.log(this.selectedEdge);
   }
 
-  handleContextMenu(data:any) {
-    this.contextData = data
+  handleContextMenu(data: any) {
+    this.contextData = data;
   }
 
   changeRoot(root: string) {
-    const changedQuery = this.contextData
-    console.log(root)
+    const changedQuery = this.contextData;
+    console.log(root);
 
-    joinTreeD3.queries = joinTreeD3.queries.map(query => {
+    joinTreeD3.queries = joinTreeD3.queries.map((query) => {
       if (query.name === changedQuery.name) {
         return {
           ...changedQuery,
           root,
-        }
+        };
       } else {
-        return query
+        return query;
       }
-    })
+    });
 
     // console.log(joinTreeD3)
   }
