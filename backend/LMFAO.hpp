@@ -8,11 +8,6 @@
 #include <Launcher.h>
 #include <Logging.hpp>
 
-std::string multifaq::dir::PATH_TO_DATA;
-std::string multifaq::dir::PATH_TO_FILES;
-std::string multifaq::dir::DATASET_NAME;
-std::string multifaq::dir::OUTPUT_DIRECTORY;
-
 class LMFAO {
 
 public:
@@ -21,17 +16,17 @@ public:
 
     ~LMFAO() {  }
 
-    void launch_server();
+    std::string launch();
 
     std::string process_next_batch(std::string msg);
 
-    std::string regenerateViews(std::string msg);
+    std::string regenerateViews(const std::vector<size_t>& rootAssignments);
 
 protected:
 
     /* Launcher for LMFAO */
     std::shared_ptr<Launcher> _launcher;
-    
+
 /*
     std::vector<std::unique_ptr<IRelation>> relations;
     Multiplexer static_multiplexer;
@@ -70,24 +65,25 @@ protected:
   
 };
 
-void LMFAO::launch_server() {
+std::string LMFAO::launch() {
     std::cout << "-------------" << std::endl;
     std::cout << "Launching Server. " << std::endl;
     std::cout << "-------------" << std::endl;
 
-    multifaq::dir::PATH_TO_DATA = "../data/example-kmeans";
-    multifaq::dir::PATH_TO_FILES = multifaq::dir::PATH_TO_DATA; 
-    multifaq::dir::DATASET_NAME = "example-kmeans"; 
-    multifaq::dir::OUTPUT_DIRECTORY = "runtime/"; 
-
     /* Create Launcher */
     _launcher.reset(new Launcher());
 
-    /* Run Launcher */
-    _launcher->launch();
+    std::string dataset = "example-kmeans";
+    std::string model = "kmeans";
 
-    std::vector<size_t> rootAssignments(7, 0); 
-    std::cout << _launcher->regenerateViews(rootAssignments) << std::endl;
+    /* Run Launcher */
+    std::string viewTree =  _launcher->launch(dataset,model);
+
+    // std::vector<size_t> rootAssignments(7, 0); 
+    // std::cout << _launcher->regenerateViews(rootAssignments) << std::endl;
+
+    // std::cout << viewTree << std::endl;
+    return viewTree; 
 }
 
 std::string LMFAO::process_next_batch(std::string msg) {
@@ -100,8 +96,7 @@ std::string LMFAO::process_next_batch(std::string msg) {
 }
 
 
-std::string LMFAO::regenerateViews(std::string msg) {
-    std::vector<size_t> rootAssignments(10, 0); 
+std::string LMFAO::regenerateViews(const std::vector<size_t>& rootAssignments) {
     return _launcher->regenerateViews(rootAssignments);
 };
 

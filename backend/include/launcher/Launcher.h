@@ -38,7 +38,7 @@ public:
     /**
      * Launches the database operations.
      */
-    int launch(); // boost::program_options::variables_map& vm);
+    std::string launch(const std::string selectedDataset, const std::string selectedModel); // boost::program_options::variables_map& vm);
     
     /**
      * Returns a pointer to the tree decomposition.

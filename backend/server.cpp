@@ -34,12 +34,22 @@ static void ev_handler(struct mg_connection *c, int ev, void *p) {
 
 static void regenViews_handler(struct mg_connection *c, int ev, void *p) {
   if (ev == MG_EV_HTTP_REQUEST) {
-
     struct http_message *hm = (struct http_message *) p;
 
     std::string uri (hm->uri.p, (int)hm->uri.len);
-    
-    std::string returnMsg = app.regenerateViews(uri); 
+
+    std::size_t found = uri.find("initialize");
+
+    std::string returnMsg = "";
+    if (found != std::string::npos)
+      returnMsg = app.launch();
+    else 
+    {
+      // TODO: generate the rootAssigment Vector 
+
+      std::vector<size_t> rootAssignments(7,0);
+      returnMsg = app.regenerateViews(rootAssignments); 
+    }
 
     // We have received an HTTP request. Parsed request is contained in `hm`.
     // Send HTTP reply to the client which shows full original request.
@@ -49,8 +59,7 @@ static void regenViews_handler(struct mg_connection *c, int ev, void *p) {
 }
 
 int main(void) {
-
-  app.launch_server();
+  // app.launch_server();
 
   struct mg_mgr mgr;
   struct mg_connection *nc;

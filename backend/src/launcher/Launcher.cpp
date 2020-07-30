@@ -26,6 +26,11 @@ std::string multifaq::config::FEATURE_CONF = "";
 std::string multifaq::config::TREEDECOMP_CONF = "";
 std::string multifaq::config::SCHEMA_CONF = "";
 
+std::string multifaq::dir::PATH_TO_DATA = "";
+std::string multifaq::dir::PATH_TO_FILES = "";
+std::string multifaq::dir::DATASET_NAME = "";
+std::string multifaq::dir::OUTPUT_DIRECTORY = "";
+
 bool multifaq::cppgen::MULTI_OUTPUT;
 bool multifaq::cppgen::RESORT_RELATIONS;
 bool multifaq::cppgen::MICRO_BENCH;
@@ -67,8 +72,14 @@ shared_ptr<CodeGenerator> Launcher::getCodeGenerator()
     return _codeGenerator;
 }
 
-int Launcher::launch() // boost::program_options::variables_map& vm
+std::string Launcher::launch(const std::string selectedDataset, const std::string selectedModel) // boost::program_options::variables_map& vm
 {
+
+    multifaq::dir::PATH_TO_DATA = "../data/"+selectedDataset;
+    multifaq::dir::PATH_TO_FILES = multifaq::dir::PATH_TO_DATA; 
+    multifaq::dir::DATASET_NAME = selectedDataset; 
+    multifaq::dir::OUTPUT_DIRECTORY = "runtime/"; 
+
     /* Define the Feature Conf File */
     FEATURE_CONF = multifaq::dir::PATH_TO_FILES+"/"+"features.conf"; 
     // multifaq::dir::PATH_TO_FILES+"/"+vm["feat"].as<std::string>(); 
@@ -77,7 +88,7 @@ int Launcher::launch() // boost::program_options::variables_map& vm
     TREEDECOMP_CONF = multifaq::dir::PATH_TO_FILES+"/"+"treedecomposition.conf";
      //multifaq::dir::PATH_TO_FILES+"/"+vm["td"].as<std::string>();
 
-    const string model = "kmeans"; // vm["model"].as<std::string>();
+    const string model = selectedModel; // vm["model"].as<std::string>();
     
     const string codeGenerator = "cpp"; //vm["codegen"].as<std::string>();
     
@@ -245,7 +256,7 @@ int Launcher::launch() // boost::program_options::variables_map& vm
     // BINFO(
     // 	"Time for Compiler: " + to_string(processingTime) + "ms.\n");
     
-    return EXIT_SUCCESS;
+    return _compiler->genViewTreeOutput();
 }
 
 std::string Launcher::regenerateViews(const std::vector<size_t> &rootAssignments)
