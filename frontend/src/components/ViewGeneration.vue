@@ -8,8 +8,12 @@
     <Row :gutter="20">
       <Col span="12">
         <h4>Output Queries</h4>
-        <div style="border: 1px solid gray">
-          {{selectedRelation}}
+        <div style="border: 1px solid gray; padding: 5px">
+          <div :key="relation.id" v-for="relation in joinTreeD3.relations">
+            <h5>{{relation.name}}</h5>
+            <hr style="margin-top: 5px; margin-bottom: 5px;">
+            <Tree :data="outputQueries[relation.name]"></Tree>
+          </div>
         </div>
       </Col>
       <Col span="12">
@@ -18,10 +22,10 @@
           <div v-if="selectedEdge.source">
             <h5>{{selectedEdge.source}} to {{selectedEdge.target}}</h5>
             <hr style="margin-top: 5px; margin-bottom: 5px;">
-            <!-- <p :key="i" v-for="(view,i) in selectedEdge.views">
-              {{joinTreeD3.views[view]}}
-            </p> -->
              <Tree :data="intermediateViews"></Tree>
+          </div>
+          <div v-else>
+            Click the arrows to inspect the intermediate views. 
           </div>
         </div>
       </Col>
@@ -37,6 +41,8 @@ import { joinTreeD3 } from "../data/joinTree";
 
 // import the visualization function -- d3 
 import showJoinTree from "../util/d3/showJoinTree"
+
+const _ = require("lodash")
 
 const dumbEdge = {
     source: "",
@@ -57,13 +63,13 @@ export default class Dataset extends Vue {
   }
 
   get intermediateViews() {
-    
     return this.selectedEdge.views.map(view => {
-      console.log(view)
       return this.joinTreeD3.views.find(v => v.name == view)
     })
-    // .map((view: string) => this.joinTreeD3.views[view])
-    // return this.joinTreeD3.views;
+  }
+
+  get outputQueries() {
+    return _.groupBy(joinTreeD3.queries, 'root')
   }
 
   relationClicked(relationId: string) {
