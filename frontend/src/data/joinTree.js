@@ -3,13 +3,15 @@
 import {
   mockJoinTree
 } from "./mockdata/mockJoinTree"
+// import _ from lodash
+const _ = require("lodash")
 
 // get the join tree json
 const joinTreeD3 = {
   nodes: mockJoinTree.relations.map(relation => {
     return {id: relation.name}
   }),
-  links: mockJoinTree.edges.map(edge => {
+  links: mockJoinTree.edges.filter(edge => edge.origin !== edge.dest).map(edge => {
     return {
       weight: edge.views.length, 
       views: edge.views,
@@ -17,7 +19,29 @@ const joinTreeD3 = {
       target: edge.dest,
     }
   }),
-  views: mockJoinTree.views,
+  views: mockJoinTree.views.map(view => {
+    return {
+      name: view.name,
+      title: `View ${view.name}`,
+      expand: true,
+      children: [
+        {
+          title: `Group By Variables`,
+          expand: false,
+          children: view.groupby.map(v => {
+            return {title: v}
+          })
+        },
+        {
+          title: `Aggregates`,
+          expand: false,
+          children: view.aggregates.map(agg => {
+            return {title: `SUM(${agg})`}
+          })
+        }
+      ]
+    }
+  }),
 }
 
 export {

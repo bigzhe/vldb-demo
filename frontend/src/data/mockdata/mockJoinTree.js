@@ -1,54 +1,253 @@
 export const mockJoinTree = {
-	"relations": [
-		{"name" : "Inventory"},
-		{"name" : "Stores"},
-		{"name" : "Weather"},
-		{"name" : "Items"}
-	],
-	"edges": [
-		{
-		"origin" : "Stores", 
-		"dest" : "Inventory",
-		"views" : ["V1", "V2"] 
-		},
-		{
-		"origin" : "Weather", 
-		"dest" : "Inventory",
-		"views" : ["V3", "V4", "V5"] 
-		},
-		{
-		"origin" : "Items", 
-		"dest" : "Inventory",
-		"views" : ["V6"] 
-		},
-		{
-		"origin" : "Inventory", 
-		"dest" : "Stores",
-		"views" : ["V7", "V8"] 
-		},
-		{
-		"origin" : "Inventory", 
-		"dest" : "Items",
-		"views" : ["V9", "V10"] 
-		},
-		{
-		"origin" : "Inventory", 
-		"dest" : "Weather",
-		"views" : ["V11"] 
-		}
-	],
-	"views": {
-		"V1" : "V1(store, SUM(1))", 
-		"V2" : "V2(store, type, SUM(1))", 
-		"V3" : "V3(date, store, SUM(1))", 
-		"V4" : "V4(date, store, rain, SUM(1))", 
-		"V5" : "V5(date, store, snow, SUM(1))", 
-		"V6" : "V6(item, SUM(1))", 
-		"V7" : "V7(store, SUM(1))", 
-		"V8" : "V8(store, SUM(1))", 
-		"V9" : "V9(item,  SUM(1))", 
-		"V10" : "V10(item, type, SUM(1))", 
-		"V11" : "V11(date, store, SUM(1)"
-	}
+   "relations": [{
+         "name": "R",
+         "id": 0
+      },
+      {
+         "name": "S",
+         "id": 1
+      },
+      {
+         "name": "T",
+         "id": 2
+      },
+      {
+         "name": "U",
+         "id": 3
+      },
+   ],
+   "edges": [
+      {
+         "origin": "R",
+         "dest": "R",
+         "views": ["V3", "V7", "V8", "V9"]
+      },
+      {
+         "origin": "R",
+         "dest": "S",
+         "views": ["V10"]
+      },
+      {
+         "origin": "R",
+         "dest": "T",
+         "views": ["V12"]
+      },
+      {
+         "origin": "S",
+         "dest": "R",
+         "views": ["V0", "V4"]
+      },
+      {
+         "origin": "S",
+         "dest": "S",
+         "views": ["V11"]
+      },
+      {
+         "origin": "T",
+         "dest": "R",
+         "views": ["V2", "V6"]
+      },
+      {
+         "origin": "T",
+         "dest": "T",
+         "views": ["V13"]
+      },
+      {
+         "origin": "T",
+         "dest": "U",
+         "views": ["V14"]
+      },
+      {
+         "origin": "U",
+         "dest": "T",
+         "views": ["V1", "V5"]
+      },
+      {
+         "origin": "U",
+         "dest": "U",
+         "views": ["V15"]
+      },
+   ],
+   "views": [{
+         "name": "V0",
+         "groupby": ["A", "B", "cluster_D"],
+         "aggregates": ["A", "B", "cluster_D"],
+      },
+      {
+         "name": "V1",
+         "groupby": ["E", "cluster_F"],
+         "aggregates": ["E", "cluster_F"],
+      },
+      {
+         "name": "V2",
+         "groupby": ["A", "cluster_E", "cluster_F"],
+         "aggregates": ["A", "cluster_E", "cluster_F"],
+      },
+      {
+         "name": "V3",
+         "groupby": ["cluster_A", "cluster_B", "cluster_C", "cluster_D", "cluster_E", "cluster_F"],
+         "aggregates": ["cluster_A", "cluster_B", "cluster_C", "cluster_D", "cluster_E", "cluster_F"],
+      },
+      {
+         "name": "V4",
+         "groupby": ["A", "B"],
+         "aggregates": ["A", "B"],
+      },
+      {
+         "name": "V5",
+         "groupby": ["E"],
+         "aggregates": ["E"],
+      },
+      {
+         "name": "V6",
+         "groupby": ["A"],
+         "aggregates": ["A"],
+      },
+      {
+         "name": "V7",
+         "groupby": ["A"],
+         "aggregates": ["A"],
+      },
+      {
+         "name": "V8",
+         "groupby": ["B"],
+         "aggregates": ["B"],
+      },
+      {
+         "name": "V9",
+         "groupby": ["C"],
+         "aggregates": ["C"],
+      },
+      {
+         "name": "V10",
+         "groupby": ["A", "B"],
+         "aggregates": ["A", "B"],
+      },
+      {
+         "name": "V11",
+         "groupby": ["D"],
+         "aggregates": ["D"],
+      },
+      {
+         "name": "V12",
+         "groupby": ["A"],
+         "aggregates": ["A"],
+      },
+      {
+         "name": "V13",
+         "groupby": ["E"],
+         "aggregates": ["E"],
+      },
+      {
+         "name": "V14",
+         "groupby": ["E"],
+         "aggregates": ["E"],
+      },
+      {
+         "name": "V15",
+         "groupby": ["F"],
+         "aggregates": ["F"],
+      },
+   ],
+   "queries": [{
+         "name": "Q0",
+         "groupby": ["cluster_A", "cluster_B", "cluster_C", "cluster_D", "cluster_E", "cluster_F"],
+         "root": "R",
+         "aggregates": ["cluster_A", "cluster_B", "cluster_C", "cluster_D", "cluster_E", "cluster_F"],
+      },
+      {
+         "name": "Q1",
+         "groupby": ["A"],
+         "root": "R",
+         "aggregates": ["A"],
+      },
+      {
+         "name": "Q2",
+         "groupby": ["B"],
+         "root": "R",
+         "aggregates": ["B"],
+      },
+      {
+         "name": "Q3",
+         "groupby": ["C"],
+         "root": "R",
+         "aggregates": ["C"],
+      },
+      {
+         "name": "Q4",
+         "groupby": ["D"],
+         "root": "R",
+         "aggregates": ["D"],
+      },
+      {
+         "name": "Q5",
+         "groupby": ["E"],
+         "root": "R",
+         "aggregates": ["E"],
+      },
+      {
+         "name": "Q6",
+         "groupby": ["F"],
+         "root": "R",
+         "aggregates": ["F"],
+      },
+   ],
+   "groups": [{
+         "name": "Group 0",
+         "views": ["V0", "V4"]
+      },
+      {
+         "name": "Group 1",
+         "views": ["V1", "V5"]
+      },
+      {
+         "name": "Group 2",
+         "views": ["V12"]
+      },
+      {
+         "name": "Group 3",
+         "views": ["V2", "V6", "V13", "V14"]
+      },
+      {
+         "name": "Group 4",
+         "views": ["V3", "V7", "V8", "V9", "V10"]
+      },
+      {
+         "name": "Group 5",
+         "views": ["V15"]
+      },
+      {
+         "name": "Group 6",
+         "views": ["V11"]
+      },
+   ],
+   "groupEdges": [{
+         "origin": "Group 0",
+         "dest": "Group 2",
+      },
+      {
+         "origin": "Group 1",
+         "dest": "Group 3",
+      },
+      {
+         "origin": "Group 2",
+         "dest": "Group 3",
+      },
+      {
+         "origin": "Group 0",
+         "dest": "Group 4",
+      },
+      {
+         "origin": "Group 3",
+         "dest": "Group 4",
+      },
+      {
+         "origin": "Group 3",
+         "dest": "Group 5",
+      },
+      {
+         "origin": "Group 4",
+         "dest": "Group 6",
+      },
+   ]
 }
-

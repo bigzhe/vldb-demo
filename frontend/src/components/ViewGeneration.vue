@@ -18,9 +18,10 @@
           <div v-if="selectedEdge.source">
             <h5>{{selectedEdge.source}} to {{selectedEdge.target}}</h5>
             <hr style="margin-top: 5px; margin-bottom: 5px;">
-            <p :key="i" v-for="(view,i) in selectedEdge.views">
+            <!-- <p :key="i" v-for="(view,i) in selectedEdge.views">
               {{joinTreeD3.views[view]}}
-            </p>
+            </p> -->
+             <Tree :data="intermediateViews"></Tree>
           </div>
         </div>
       </Col>
@@ -53,6 +54,16 @@ export default class Dataset extends Vue {
   mounted() {
     this.renderD3();
     console.log(joinTreeD3)
+  }
+
+  get intermediateViews() {
+    
+    return this.selectedEdge.views.map(view => {
+      console.log(view)
+      return this.joinTreeD3.views.find(v => v.name == view)
+    })
+    // .map((view: string) => this.joinTreeD3.views[view])
+    // return this.joinTreeD3.views;
   }
 
   relationClicked(relationId: string) {
