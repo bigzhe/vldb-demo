@@ -63,7 +63,7 @@ export default class Dataset extends Vue {
   }
 
   get intermediateViews() {
-    return this.selectedGroup.views.map((view) => {
+    return this.selectedGroup.views.map((view: string) => {
       return this.joinTreeD3.views.find((v) => v.name == view);
     });
   }
