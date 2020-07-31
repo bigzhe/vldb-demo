@@ -67,20 +67,44 @@ export default new Vuex.Store({
     regenerateViews({
       state,
       commit
-    }, {rootIndicators, onSuccess}) {
+    }, {
+      rootIndicators,
+      onSuccess
+    }) {
 
       // await axios.get
       // returns a Promise
       return axios({
         method: 'get',
-        url: ` http://localhost:8081/regen/[${rootIndicators.join(',')}]`
+        url: ` http://localhost:8082/[${rootIndicators.join(',')}]`
       }).then(function (response) {
-          console.log(response)
-          onSuccess()
+        console.log(response)
+        onSuccess()
       }).catch(err => {
         console.log(err);
       });
-    }
+    },
+    init({
+      state,
+      commit
+    }, {
+      dataset,
+      model,
+      onSuccess
+    }) {
+
+      // await axios.get
+      // returns a Promise
+      return axios({
+        method: 'get',
+        url: ` http://localhost:8081/[${dataset},${model}]`
+      }).then(function (response) {
+        onSuccess()
+      }).catch(err => {
+        console.log(err);
+      });
+    },
   },
+
   modules: {}
 })

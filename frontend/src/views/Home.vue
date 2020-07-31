@@ -11,6 +11,9 @@
 
     <ViewGeneration ref="viewGeneration" v-if="tab == 'viewGeneration'"></ViewGeneration>
     <Dataset ref="dataset" v-else-if="tab == 'dataset'"></Dataset>
+    <ViewGroups ref="viewGroups" v-else-if="tab == 'viewGroups'"></ViewGroups>
+    <CodeGeneration ref="codeGeneration" v-else-if="tab == 'codeGeneration'"></CodeGeneration>
+    <Application ref="application" v-else-if="tab == 'application'"></Application>
 
   </div>
 </template>
@@ -18,7 +21,9 @@
 <script>
 import Dataset from "../components/Dataset.vue";
 import ViewGeneration from "../components/ViewGeneration";
-
+import ViewGroups from "../components/ViewGroups";
+import CodeGeneration from "../components/CodeGeneration";
+import Application from "../components/Application";
 
 export default {
   name: "home",
@@ -33,6 +38,9 @@ export default {
   components: {
     Dataset,
     ViewGeneration,
+    ViewGroups,
+    CodeGeneration,
+    Application,
   },
   mounted: function() {
 
