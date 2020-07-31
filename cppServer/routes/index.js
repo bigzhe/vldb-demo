@@ -11,6 +11,17 @@ const loadLanguages = require("prismjs/components/");
 console.log(loadLanguages);
 loadLanguages(["cpp"]);
 
+var NEW_LINE_EXP = /\n(?!$)/g;
+var lineNumbersWrapper;
+
+Prism.hooks.add('after-tokenize', function (env) {
+  var match = env.code.match(NEW_LINE_EXP);
+  var linesNum = match ? match.length + 1 : 1;
+  var lines = new Array(linesNum + 1).join('<span></span>');
+
+  lineNumbersWrapper = `<span aria-hidden="true" class="line-numbers-rows">${lines}</span>`;
+});
+
 /* GET cpp files list. */
 router.get('/cpps', function (req, res, next) {
   fs.readdir(CPP_FILES_PATH, (err, files) => {
@@ -26,7 +37,9 @@ router.get('/file/:filename', function (req, res, next) {
   const code = fs.readFileSync(CPP_FILES_PATH + filename, {
     encoding: 'utf-8'
   })
-  const html = Prism.highlight(code, Prism.languages.cpp, 'cpp');
+  const html = Prism.highlight(code, Prism.languages.cpp, 'cpp') + lineNumbersWrapper;
+
+  
 
 
   return res.json({

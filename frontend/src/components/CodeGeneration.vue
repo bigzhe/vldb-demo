@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="line-numbers">
     <Row>
       <Col span="12">
         Select File:
@@ -11,7 +11,7 @@
     </Row>
     <div style="border: 1px solid gray; padding: 5px; margin-top: 20px">
       <!-- code here -->
-      <pre>
+      <pre class="language-cpp line-numbers" data-line="1-2, 5, 9-20">
         <code v-html="fileHtml" class="language-cpp">
         </code>
       </pre>
@@ -58,7 +58,7 @@ export default class Dataset extends Vue {
         self.fileContent = code;
         self.fileHtml = html;
 
-        console.log(self.fileContent, self.fileHtml)
+        // console.log(self.fileContent, self.fileHtml)
       },
     });
   }
