@@ -74,7 +74,6 @@ shared_ptr<CodeGenerator> Launcher::getCodeGenerator()
 
 std::string Launcher::launch(const std::string selectedDataset, const std::string selectedModel) // boost::program_options::variables_map& vm
 {
-
     multifaq::dir::PATH_TO_DATA = "../data/"+selectedDataset;
     multifaq::dir::PATH_TO_FILES = multifaq::dir::PATH_TO_DATA; 
     multifaq::dir::DATASET_NAME = selectedDataset; 
@@ -82,33 +81,16 @@ std::string Launcher::launch(const std::string selectedDataset, const std::strin
 
     /* Define the Feature Conf File */
     FEATURE_CONF = multifaq::dir::PATH_TO_FILES+"/"+"features.conf"; 
-    // multifaq::dir::PATH_TO_FILES+"/"+vm["feat"].as<std::string>(); 
 
     /* Define the TreeDecomposition Conf File */
     TREEDECOMP_CONF = multifaq::dir::PATH_TO_FILES+"/"+"treedecomposition.conf";
-     //multifaq::dir::PATH_TO_FILES+"/"+vm["td"].as<std::string>();
 
     const string model = selectedModel; // vm["model"].as<std::string>();
     
     const string codeGenerator = "cpp"; //vm["codegen"].as<std::string>();
     
-    // multifaq::cppgen::PARALLELIZATION_TYPE parallelization_type =
-    // std::string parallel = vm["parallel"].as<std::string>();   
-    // if (parallel.compare("task") == 0)
-    //     parallelization_type =  multifaq::cppgen::TASK_PARALLELIZATION;
-    // else if (parallel.compare("domain") == 0)
-    //     parallelization_type =  multifaq::cppgen::DOMAIN_PARALLELIZATION;
-    // else if (parallel.compare("both") == 0)
-    //     parallelization_type = multifaq::cppgen::BOTH_PARALLELIZATION;
-    // else if (parallel.compare("none") != 0)
-    //     ERROR("ERROR - We only support task and/or domain parallelism. "<<
-    //           "We continue single threaded.\n\n");
-
-    // multifaq::cppgen::RESORT_RELATIONS = vm.count("resort");
-
     multifaq::cppgen::MULTI_OUTPUT = true; 
-    // (vm["mo"].as<bool>()) && !multifaq::cppgen::RESORT_RELATIONS;
-
+    
     multifaq::cppgen::MICRO_BENCH = true; // vm.count("microbench");
 
     multifaq::cppgen::COMPRESS_AGGREGATES = true; // vm["compress"].as<bool>();
@@ -116,10 +98,6 @@ std::string Launcher::launch(const std::string selectedDataset, const std::strin
     multifaq::cppgen::BENCH_INDIVIDUAL = true; // vm.count("bench_individual");
 
     multifaq::cppgen::PARALLEL_TYPE =  multifaq::cppgen::BOTH_PARALLELIZATION;
-
-    /* TODO: when this gets fixed, degree needs to be passed to relevant models. */
-    // if (vm["degree"].as<int>() > 1)
-    //     ERROR("A degree > 1 is currenlty not supported.\n");
 
     /* Build tree decompostion. */
     _treeDecomposition.reset(new TreeDecomposition());
@@ -200,7 +178,8 @@ std::string Launcher::launch(const std::string selectedDataset, const std::strin
     {
         ERROR("The model "+model+" is not supported. \n");
         exit(1);
-    }    
+    }
+
     _application->run();
 
     DINFO("INFO: Start QueryCompiler.\n");
@@ -261,7 +240,7 @@ std::string Launcher::launch(const std::string selectedDataset, const std::strin
 
 std::string Launcher::regenerateViews(const std::vector<size_t> &rootAssignments)
 {
-    // TODO:  assert(rootAssignments.size() == _compiler->numberOfQueries());
+    // assert(rootAssignments.size() == _compiler->numberOfQueries());
     
     for (size_t qid = 0; qid < _compiler->numberOfQueries(); qid++)
     {
@@ -269,9 +248,20 @@ std::string Launcher::regenerateViews(const std::vector<size_t> &rootAssignments
         _compiler->setQueryRoot(qid, rootID);
     }
 
-    // TODO: need to call compile !! 
+    std::cout << "Here 1" << std::endl; 
 
     // This means we also need to clean up the existing queries / views ! 
+
+    // CLEAR VIEW TREE 
+    _compiler->clear();
+
+    std::cout << "Here 2" << std::endl; 
+
+    // COMPILE VIEW TREE 
+    _compiler->compile();
+
+    std::cout << "Here 3" << std::endl; 
+
 
     return _compiler->genViewTreeOutput();
 }

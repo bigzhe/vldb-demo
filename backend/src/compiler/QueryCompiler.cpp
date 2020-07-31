@@ -174,6 +174,26 @@ Function* QueryCompiler::getFunction(size_t f_id)
     return _functionList[f_id];
 }
 
+void QueryCompiler::clear()
+{   
+    for (View* view :  _viewList)
+        delete view;
+
+    delete[] viewToGroupMapping;
+    
+    _cache.clear();
+    _viewCache.clear();
+
+    viewGroups.clear();
+    _viewList.clear();
+
+    for (Query* q : _queryList)
+    {
+        for (const auto  agg : q->_aggregates)
+            agg->_incoming.clear();
+    }
+}
+
 pair<size_t,size_t> QueryCompiler::compileViews(
     TDNode* node, size_t targetID, vector<prod_bitset> aggregate, var_bitset freeVars)
 {

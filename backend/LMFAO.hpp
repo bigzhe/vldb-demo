@@ -16,7 +16,7 @@ public:
 
     ~LMFAO() {  }
 
-    std::string launch();
+    std::string launch(std::string dataset, std::string model);
 
     std::string process_next_batch(std::string msg);
 
@@ -65,7 +65,7 @@ protected:
   
 };
 
-std::string LMFAO::launch() {
+std::string LMFAO::launch(std::string dataset, std::string model) {
     std::cout << "-------------" << std::endl;
     std::cout << "Launching Server. " << std::endl;
     std::cout << "-------------" << std::endl;
@@ -73,8 +73,8 @@ std::string LMFAO::launch() {
     /* Create Launcher */
     _launcher.reset(new Launcher());
 
-    std::string dataset = "example-kmeans";
-    std::string model = "kmeans";
+    // dataset = "example-kmeans";
+    // model = "kmeans";
 
     /* Run Launcher */
     std::string viewTree =  _launcher->launch(dataset,model);
@@ -97,6 +97,11 @@ std::string LMFAO::process_next_batch(std::string msg) {
 
 
 std::string LMFAO::regenerateViews(const std::vector<size_t>& rootAssignments) {
+
+    std::cout << "-------------" << std::endl;
+    std::cout << "Processing Batch " << std::endl;
+    std::cout << "-------------" << std::endl;
+
     return _launcher->regenerateViews(rootAssignments);
 };
 

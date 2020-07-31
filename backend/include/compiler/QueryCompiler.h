@@ -258,6 +258,8 @@ public:
 
     void setQueryRoot(size_t qid, size_t newRootID); 
     
+    void clear(); 
+    
 private:
     /* Pointer to the tree decomposition*/
     std::shared_ptr<TreeDecomposition> _td;
