@@ -104,6 +104,44 @@ export default new Vuex.Store({
         console.log(err);
       });
     },
+    fetchCppFiles({
+      state,
+      commit
+    }, {
+      onSuccess
+    }) {
+      // returns a Promise
+      return axios({
+        method: 'get',
+        url: ` http://localhost:3000/cpps`
+      }).then(function (response) {
+        onSuccess(response.data)
+      }).catch(err => {
+        console.log(err);
+      });
+    },
+    fetchFileContent({
+      state,
+      commit
+    }, {
+      filename,
+      onSuccess
+    }) {
+
+      // returns a Promise
+      return axios({
+        method: 'get',
+        url: `http://localhost:3000/file/${filename}`
+      }).then(function (response) {
+        // console.log(response.data)
+        onSuccess(response.data.code, response.data.html)
+      }).catch(err => {
+        console.log(err);
+      });
+    },
+
+
+
   },
 
   modules: {}
