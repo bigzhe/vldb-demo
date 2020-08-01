@@ -11,8 +11,8 @@
     </Row>
     <div style="border: 1px solid gray; padding: 5px; margin-top: 20px">
       <div v-if="showCode">
-      <!-- code here -->
-      <pre class="language-cpp" data-line="1-2, 5, 9-20" >
+        <!-- code here -->
+        <pre class="language-cpp" data-line="1-2, 5, 9-20">
         <code class="language-cpp">
         {{fileContent}}
         </code>
@@ -35,7 +35,7 @@ export default class Dataset extends Vue {
   fileContent: string = "";
   fileHtml: string = "";
   files: string[] = [];
-  showCode: boolean = true
+  showCode: boolean = true;
 
   mounted() {
     // files
@@ -60,19 +60,19 @@ export default class Dataset extends Vue {
       onSuccess: (code: string, html: string) => {
         self.fileContent = code;
         self.fileHtml = html;
-        self.showCode = false
+        self.showCode = false;
 
         Vue.nextTick(function () {
-            // DOM updated
-            self.showCode = true
-            Vue.nextTick(function () {
-              Prism.highlightAll();
-            })
-            
-            
-          // window.dispatchEvent(new Event('resize'));
-        })
-        
+          // DOM updated
+          self.showCode = true;
+          Vue.nextTick(function () {
+            Prism.highlightAll();
+            window.dispatchEvent(new Event('resize'));
+          });
+
+          
+        });
+
         // console.log(Prism.highlightAll())
       },
     });
