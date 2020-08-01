@@ -64,7 +64,6 @@ static void regenViews_handler(struct mg_connection *c, int ev, void *p) {
     else if (substr.compare("regen") == 0)
     {
       std::cout << "New root assignments: ";
-
       std::vector<size_t> rootAssignment;
 
       while(stream.good()) {
@@ -77,6 +76,10 @@ static void regenViews_handler(struct mg_connection *c, int ev, void *p) {
 
       std::cout << std::endl;
       returnMsg = app.regenerateViews(rootAssignment);
+    }
+    else if (substr.compare("codegen") == 0)
+    {
+        app.generateCode();
     }
     else 
     {
@@ -93,7 +96,11 @@ static void regenViews_handler(struct mg_connection *c, int ev, void *p) {
   }
 }
 
-int main(void) {
+int main(void)
+{
+  // TODO: REMOVE and CLEANUP app->launch
+  app.launch("dataset", "model");
+
   struct mg_mgr mgr;
   struct mg_connection *nc;
 

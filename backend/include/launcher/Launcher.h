@@ -75,6 +75,11 @@ public:
      */
     std::string generateViewGroups();
 
+    /**
+     * Generates the C++ code
+     */
+    void generateCode(); 
+
 private:
 
     //! Query Compiler that turns queries into views. 
@@ -94,7 +99,11 @@ private:
 
     //! Path to the files used by the database.
     std::string _outputDirectory;
-    
+
+    bool launcherInitialized = false; 
+
+    bool generateApplicationHandler = false; 
+        
 };
 
 #endif // INCLUDE_RUN_LAUNCHER_H_
