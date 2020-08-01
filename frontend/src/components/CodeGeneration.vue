@@ -10,11 +10,14 @@
       <Col span="12">Highlight:</Col>
     </Row>
     <div style="border: 1px solid gray; padding: 5px; margin-top: 20px">
+      <div v-if="showCode">
       <!-- code here -->
-      <pre class="language-cpp line-numbers" data-line="1-2, 5, 9-20">
-        <code v-html="fileHtml" class="language-cpp">
+      <pre class="language-cpp" data-line="1-2, 5, 9-20" >
+        <code class="language-cpp">
+        {{fileContent}}
         </code>
       </pre>
+      </div>
     </div>
   </div>
 </template>
@@ -22,7 +25,6 @@
 <script lang="ts">
 import { Component, Watch, Vue } from "vue-property-decorator";
 // import Prism from "prismjs";
-
 
 const _ = require("lodash");
 
@@ -33,6 +35,7 @@ export default class Dataset extends Vue {
   fileContent: string = "";
   fileHtml: string = "";
   files: string[] = [];
+  showCode: boolean = true
 
   mounted() {
     // files
@@ -54,11 +57,23 @@ export default class Dataset extends Vue {
     const self = this;
     this.$store.dispatch("fetchFileContent", {
       filename: self.selectedFile,
-      onSuccess: (code:string, html:string) => {
+      onSuccess: (code: string, html: string) => {
         self.fileContent = code;
         self.fileHtml = html;
+        self.showCode = false
 
-        // console.log(self.fileContent, self.fileHtml)
+        Vue.nextTick(function () {
+            // DOM updated
+            self.showCode = true
+            Vue.nextTick(function () {
+              Prism.highlightAll();
+            })
+            
+            
+          // window.dispatchEvent(new Event('resize'));
+        })
+        
+        // console.log(Prism.highlightAll())
       },
     });
   }

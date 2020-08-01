@@ -37,7 +37,10 @@ router.get('/file/:filename', function (req, res, next) {
   const code = fs.readFileSync(CPP_FILES_PATH + filename, {
     encoding: 'utf-8'
   })
-  const html = Prism.highlight(code, Prism.languages.cpp, 'cpp') + lineNumbersWrapper;
+
+  let html = Prism.highlight(code, Prism.languages.cpp, 'cpp');
+  html += lineNumbersWrapper
+  // html += highlightWrapper
 
   
 
