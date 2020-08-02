@@ -8,7 +8,7 @@
     <Row :gutter="20">
       <Col span="12">
         <h4>Output Queries</h4>
-        <div style="border: 1px solid gray; padding: 5px">
+        <div :style="`border: 1px solid gray; padding: 5px; height: ${boxHeight}px; overflow-y: scroll;`">
           <p>Right-click the queries to change their root</p>
           <div style="margin-top: 5px" :key="relation.id" v-for="relation in joinTreeD3.relations">
             <h5>{{relation.name}}</h5>
@@ -27,7 +27,7 @@
       </Col>
       <Col span="12">
         <h4>Intermediate Views</h4>
-        <div style="border: 1px solid gray; padding: 5px">
+        <div :style="`border: 1px solid gray; padding: 5px; height: ${boxHeight}px; overflow-y: scroll;`">
           <div v-if="selectedEdge.source">
             <h5>{{selectedEdge.source}} to {{selectedEdge.target}}</h5>
             <hr style="margin-top: 5px; margin-bottom: 5px;" />
@@ -73,6 +73,7 @@ export default class Dataset extends Vue {
   selectedEdge: { source: string; target: string; views: string[] } = dumbEdge;
   joinTreeD3 = joinTreeD3;
   contextData: any = {};
+  boxHeight:number = (window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight) - 500;
 
   mounted() {
     this.renderD3();
