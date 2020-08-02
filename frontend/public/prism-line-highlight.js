@@ -96,7 +96,7 @@
 			mutateActions.push(function () {
 				line.setAttribute('aria-hidden', 'true');
 				line.setAttribute('data-range', currentRange);
-				line.className = (classes || '') + ' line-highlight' + ` tag-${tag}`;
+				line.className = (classes || '') + ' line-highlight' + ` tag-${tag.toLowerCase()}`;
 			});
 
 			// if the line-numbers plugin is enabled, then there is no reason for this plugin to display the line numbers
