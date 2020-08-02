@@ -22,6 +22,8 @@ public:
 
     std::string regenerateViews(const std::vector<size_t>& rootAssignments);
 
+    void generateCode();
+
 protected:
 
     /* Launcher for LMFAO */
@@ -73,8 +75,8 @@ std::string LMFAO::launch(std::string dataset, std::string model) {
     /* Create Launcher */
     _launcher.reset(new Launcher());
 
-    // dataset = "example-kmeans";
-    // model = "kmeans";
+    dataset = "example-kmeans";
+    model = "kmeans";
 
     /* Run Launcher */
     std::string viewTree =  _launcher->launch(dataset,model);
@@ -105,5 +107,10 @@ std::string LMFAO::regenerateViews(const std::vector<size_t>& rootAssignments) {
     return _launcher->regenerateViews(rootAssignments);
 };
 
+
+void LMFAO::generateCode()
+{
+    _launcher->generateCode();
+};
 
 #endif /* APPLICATION_HPP */

@@ -74,6 +74,9 @@ shared_ptr<CodeGenerator> Launcher::getCodeGenerator()
 
 std::string Launcher::launch(const std::string selectedDataset, const std::string selectedModel) // boost::program_options::variables_map& vm
 {
+    if (launcherInitialized)
+        return _compiler->genViewTreeOutput();
+
     multifaq::dir::PATH_TO_DATA = "../data/"+selectedDataset;
     multifaq::dir::PATH_TO_FILES = multifaq::dir::PATH_TO_DATA; 
     multifaq::dir::DATASET_NAME = selectedDataset; 
@@ -91,11 +94,11 @@ std::string Launcher::launch(const std::string selectedDataset, const std::strin
     
     multifaq::cppgen::MULTI_OUTPUT = true; 
     
-    multifaq::cppgen::MICRO_BENCH = true; // vm.count("microbench");
+    multifaq::cppgen::MICRO_BENCH = true;
 
     multifaq::cppgen::COMPRESS_AGGREGATES = true; // vm["compress"].as<bool>();
     
-    multifaq::cppgen::BENCH_INDIVIDUAL = true; // vm.count("bench_individual");
+    multifaq::cppgen::BENCH_INDIVIDUAL = false; // vm.count("bench_individual");
 
     multifaq::cppgen::PARALLEL_TYPE =  multifaq::cppgen::BOTH_PARALLELIZATION;
 
@@ -180,6 +183,8 @@ std::string Launcher::launch(const std::string selectedDataset, const std::strin
         exit(1);
     }
 
+    generateApplicationHandler = hasApplicationHandler; 
+
     _application->run();
 
     DINFO("INFO: Start QueryCompiler.\n");
@@ -189,12 +194,6 @@ std::string Launcher::launch(const std::string selectedDataset, const std::strin
 
     DINFO("INFO: End QueryCompiler.\n");
 
-    // _codeGenerator.reset(new CppGenerator(shared_from_this()));    
-    // _codeGenerator->generateCode(hasApplicationHandler, hasDynamicFunctions);
-
-    // if (hasApplicationHandler)
-    //     _application->generateCode();
-    
     int64_t processingTime = duration_cast<milliseconds>(
         system_clock::now().time_since_epoch()).count() - start;
 
@@ -231,15 +230,44 @@ std::string Launcher::launch(const std::string selectedDataset, const std::strin
         cout << "Unable to open compiler-data.out \n";
     
     ofs.close();
-    
+
+    launcherInitialized = true; 
+
     // BINFO(
     // 	"Time for Compiler: " + to_string(processingTime) + "ms.\n");
     
     return _compiler->genViewTreeOutput();
 }
 
+
+void Launcher::generateCode()
+{
+    if (!launcherInitialized)
+    {  
+        std::cerr << "You need to first initialize LMFAO" << std::endl;
+        return; 
+    }  
+
+    bool hasDynamicFunctions = false;
+
+    _codeGenerator.reset(new CppGenerator(shared_from_this()));    
+
+    _codeGenerator->generateCode(
+        generateApplicationHandler, hasDynamicFunctions);
+
+    if (generateApplicationHandler)
+        _application->generateCode();
+}
+
+
 std::string Launcher::regenerateViews(const std::vector<size_t> &rootAssignments)
 {
+    if (!launcherInitialized)
+    {   
+        std::cerr << "You need to first initialize LMFAO" << std::endl;
+        return ""; 
+    }  
+
     // assert(rootAssignments.size() == _compiler->numberOfQueries());
     
     for (size_t qid = 0; qid < _compiler->numberOfQueries(); qid++)
@@ -248,20 +276,11 @@ std::string Launcher::regenerateViews(const std::vector<size_t> &rootAssignments
         _compiler->setQueryRoot(qid, rootID);
     }
 
-    std::cout << "Here 1" << std::endl; 
-
-    // This means we also need to clean up the existing queries / views ! 
-
     // CLEAR VIEW TREE 
     _compiler->clear();
 
-    std::cout << "Here 2" << std::endl; 
-
     // COMPILE VIEW TREE 
     _compiler->compile();
-
-    std::cout << "Here 3" << std::endl; 
-
 
     return _compiler->genViewTreeOutput();
 }
