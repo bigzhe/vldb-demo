@@ -75,7 +75,7 @@
 		var offset = +pre.getAttribute('data-line-offset') || 0;
 
 		// tag-line
-		const tagLine = JSON.parse(pre.getAttribute('tag-line'))
+		const tagLine =  pre.getAttribute('tag-line')? JSON.parse(pre.getAttribute('tag-line')) : {}
 
 		var parseMethod = isLineHeightRounded() ? parseInt : parseFloat;
 		var lineHeight = parseMethod(getComputedStyle(pre).lineHeight);

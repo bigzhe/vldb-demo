@@ -12,14 +12,12 @@
           <Option v-for="(f,i) in files" :value="f" :key="i">{{ f }}</Option>
         </Select>
       </Col>
-      <Col span="12">Highlight:</Col>
-      <Select
-          placeholder="Please select"
-          v-model="selectedTag"
-          style="width:200px"
-        >
+      <Col span="12">
+        Highlight:
+        <Select placeholder="Please select" v-model="selectedTag" style="width:200px">
           <Option v-for="(f,i) in tags" :value="f" :key="i">{{ f }}</Option>
         </Select>
+      </Col>
     </Row>
     <div style="border: 1px solid gray; padding: 5px; margin-top: 20px">
       <div v-if="showCode">
@@ -44,14 +42,14 @@ const _ = require("lodash");
 export default class Dataset extends Vue {
   // data
   selectedFile: string = "";
-  selectedTag: string = "ALL"
+  selectedTag: string = "ALL";
   fileContent: string = "";
   fileHtml: string = "";
   files: string[] = [];
   showCode: boolean = true;
   tagLines: string = "";
   dataLines: string = "";
-  tags = ["ALL", "JOIN", "AGGREGATES", "RUNNING SUM", "OUTPUT"]
+  tags = ["ALL", "JOIN", "AGGREGATES", "RUNNING SUM", "OUTPUT"];
 
   mounted() {
     // files
@@ -68,7 +66,10 @@ export default class Dataset extends Vue {
   }
 
   extractCodeBlocks(code: string) {
-    let TAGS = this.selectedTag == "ALL" ? ["JOIN", "AGGREGATES", "RUNNING SUM", "OUTPUT"]: [this.selectedTag]
+    let TAGS =
+      this.selectedTag == "ALL"
+        ? ["JOIN", "AGGREGATES", "RUNNING SUM", "OUTPUT"]
+        : [this.selectedTag];
 
     // find the code blocks in code
     const lines = code.split("\n");
@@ -153,9 +154,8 @@ export default class Dataset extends Vue {
         Prism.highlightAll();
         window.dispatchEvent(new Event("resize"));
       });
-    })
+    });
   }
-
 }
 </script>
 
