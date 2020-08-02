@@ -14,7 +14,7 @@
     <div style="border: 1px solid gray; padding: 5px; margin-top: 20px">
       <div v-if="showCode">
         <!-- code here -->
-        <pre class="language-cpp" data-line="1-2, 5, 9-20" tag-line="{'1-2': 'join', '5': 'aggregates', 9-20: 'running-sum'}">
+        <pre class="language-cpp" data-line="1-2, 5, 9-20" tag-line='{"1-2": "join", "5": "aggregates", "9-20": "running-sum"}'>
         <code class="language-cpp">
         {{fileContent}}
         </code>
