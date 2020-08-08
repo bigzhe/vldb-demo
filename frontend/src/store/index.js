@@ -76,7 +76,7 @@ export default new Vuex.Store({
       // returns a Promise
       return axios({
         method: 'get',
-        url: ` http://localhost:8082/[${rootIndicators.join(',')}]`
+        url: ` http://localhost:8081/regen/${rootIndicators.join(',')}`
       }).then(function (response) {
         console.log(response)
         onSuccess()
@@ -92,12 +92,11 @@ export default new Vuex.Store({
       model,
       onSuccess
     }) {
-
       // await axios.get
       // returns a Promise
       return axios({
         method: 'get',
-        url: ` http://localhost:8081/[${dataset},${model}]`
+        url: `http://localhost:8081/init/${dataset.toLowerCase()},${model}`
       }).then(function (response) {
         onSuccess()
       }).catch(err => {

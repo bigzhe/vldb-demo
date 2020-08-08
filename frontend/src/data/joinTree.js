@@ -22,11 +22,11 @@ const joinTreeD3 = {
     }
   }),
   groupNodes: mockJoinTree.groups.map(group => {
-    return {id: group.name, views: group.views}
+    return {id: group.name, views: group.views, base: group.relation}
   }),
   groupEdges: mockJoinTree.groupEdges.map(groupEdge => {
     return {
-      weight: 1, 
+      weight: 2.5, 
       views: groupEdge.views,
       source: groupEdge.origin,
       target: groupEdge.dest,
@@ -58,7 +58,7 @@ const joinTreeD3 = {
   queries: mockJoinTree.queries.map(query => {
     return {
       ...query,
-      title: `${query.name}`,
+      title: `Query ${query.name}`,
       expand: false,
       contextmenu: true,
       children: [

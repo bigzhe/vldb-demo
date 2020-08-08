@@ -1,6 +1,6 @@
 <template>
   <div style="margin-top: 00px" class="container-fluid">
-    <Tabs @on-click="handleClick" style="margin-bottom: 0;">
+    <Tabs :value=tab @on-click="handleClick" style="margin-bottom: 0;">
       <TabPane label="Input" name="dataset"></TabPane>
       <TabPane label="View Generation" name="viewGeneration"></TabPane>
       <TabPane label="View Groups" name="viewGroups"></TabPane>
@@ -14,7 +14,6 @@
     <ViewGroups ref="viewGroups" v-else-if="tab == 'viewGroups'"></ViewGroups>
     <CodeGeneration ref="codeGeneration" v-else-if="tab == 'codeGeneration'"></CodeGeneration>
     <Application ref="application" v-else-if="tab == 'application'"></Application>
-
   </div>
 </template>
 
@@ -29,10 +28,9 @@ export default {
   name: "home",
   data() {
     return {
-      // tab: "dataset"
       interval: null,
       processingStatus: "pause",
-      previousCount: 0
+      previousCount: 0,
     };
   },
   components: {
@@ -42,19 +40,18 @@ export default {
     CodeGeneration,
     Application,
   },
-  mounted: function() {
-
-  },
+  mounted: function () {},
   methods: {
     handleClick(newTab) {
       this.$store.commit("SET_TAB", newTab);
     },
   },
   computed: {
-    tab: function() {
+    tab: function () {
+      console.log("tab changed");
       return this.$store.state.tab;
     },
-  }
+  },
 };
 </script>
 <style scoped>
