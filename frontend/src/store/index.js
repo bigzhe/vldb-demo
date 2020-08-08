@@ -134,6 +134,7 @@ export default new Vuex.Store({
       }).then(function (response) {
         // console.log(response.data)
         onSuccess(response.data.code, response.data.html)
+
       }).catch(err => {
         console.log(err);
       });

@@ -74,6 +74,9 @@
 		var ranges = lines.replace(/\s+/g, '').split(',').filter(Boolean);
 		var offset = +pre.getAttribute('data-line-offset') || 0;
 
+		// tag-line
+		const tagLine =  pre.getAttribute('tag-line')? JSON.parse(pre.getAttribute('tag-line')) : {}
+
 		var parseMethod = isLineHeightRounded() ? parseInt : parseFloat;
 		var lineHeight = parseMethod(getComputedStyle(pre).lineHeight);
 		var hasLineNumbers = hasClass(pre, 'line-numbers');
@@ -82,6 +85,7 @@
 
 		ranges.forEach(function (currentRange) {
 			var range = currentRange.split('-');
+			var tag = tagLine[currentRange]
 
 			var start = +range[0];
 			var end = +range[1] || start;
@@ -92,7 +96,7 @@
 			mutateActions.push(function () {
 				line.setAttribute('aria-hidden', 'true');
 				line.setAttribute('data-range', currentRange);
-				line.className = (classes || '') + ' line-highlight';
+				line.className = (classes || '') + ' line-highlight' + ` tag-${tag.toLowerCase()}`;
 			});
 
 			// if the line-numbers plugin is enabled, then there is no reason for this plugin to display the line numbers

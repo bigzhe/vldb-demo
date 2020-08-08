@@ -9,7 +9,7 @@ export default function showJoinTree(originGraph, id, clickLinkCallBack, clickNo
 
   // compute the clt 
   let width = document.getElementById(id).getBoundingClientRect().width - 22
-  let height = (window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight) - 300
+  let height = (window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight) - 500
 
   // height /= 2
 
