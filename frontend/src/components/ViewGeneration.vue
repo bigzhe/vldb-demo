@@ -168,7 +168,7 @@ export default class Dataset extends Vue {
 }
 </script>
 
-<style >
+<style>
 .ivu-form-item {
   margin-bottom: 0px;
 }
@@ -176,11 +176,20 @@ export default class Dataset extends Vue {
 .links line {
   stroke: #999;
   stroke-opacity: 0.6;
+  
+}
+
+#joinTree .links line {
+  cursor: pointer;
 }
 
 .nodes circle {
   stroke: #fff;
   stroke-width: 1.5px;
+}
+
+#dependencyGraph .nodes circle {
+  cursor: pointer;
 }
 
 text {
