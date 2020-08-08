@@ -27,7 +27,7 @@
       </Col>
       <Col span="12">
         <h4>Intermediate Views</h4>
-        <div :style="`border: 1px solid gray; padding: 5px; height: ${boxHeight}px; overflow-y: scroll;`">
+        <div style="border: 1px solid gray; padding: 5px; height: ${boxHeight}px; overflow-y: scroll;">
           <div v-if="selectedEdge.source">
             <h5>{{selectedEdge.source}} to {{selectedEdge.target}}</h5>
             <hr style="margin-top: 5px; margin-bottom: 5px;" />
@@ -38,12 +38,16 @@
       </Col>
     </Row>
     <br />
-    <Row style="margin-bottom: 10px;" :gutter="20">
-      <Col span="12">
+    <Row style="margin-bottom: 10px;"  >
+      <Col span="12" justify="end">
+        <Row type="flex" justify="end" style="margin-right: 40px;">
         <Button @click="regenerateViews" type="primary">Regenerate Views</Button>
+        </Row>
       </Col>
       <Col span="12">
+        <Row type="flex" justify="end" style="margin-right: 40px;">
         <Button @click="groupViews" type="primary">Group Views</Button>
+        </Row>
       </Col>
     </Row>
   </div>

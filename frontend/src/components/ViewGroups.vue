@@ -8,9 +8,10 @@
     <Row :gutter="20">
       <Col span="24">
         <h4>View Group</h4>
-        <div :style="`border: 1px solid gray; padding: 5px; height: ${boxHeight}px; overflow-y: scroll;`">
-          <div v-if="selectedGroup.group">
-            <h5>{{selectedGroup.group}}</h5>
+        <div style="border: 1px solid gray; padding: 5px; height: ${boxHeight}px; overflow-y: scroll;">
+          <div v-if="selectedGroup.id">
+            <!-- <h5>{{selectedGroup.group}}</h5> -->
+            <h5> {{selectedGroup.id}} is computed over Relation {{ selectedGroup.base }} </h5> 
             <hr style="margin-top: 5px; margin-bottom: 5px;" />
             <Tree :data="intermediateViews"></Tree>
           </div>
@@ -19,12 +20,8 @@
       </Col>
     </Row>
     <br />
-    <Row style="margin-bottom: 10px;" :gutter="20">
-      <Col span="12">
-      </Col>
-      <Col span="12">
+    <Row style="margin-bottom: 10px;" type="flex" justify="end" :gutter="0">
         <Button @click="generateCode" type="primary">Generate Code</Button>
-      </Col>
     </Row>
   </div>
 </template>
@@ -47,13 +44,16 @@ const dumbEdge = {
   views: [],
 };
 
+const dumbNode = {
+    id: "",
+    base: "",
+    views: [""],
+  };
+
 @Component({})
 export default class Dataset extends Vue {
   // data
-  selectedGroup: any = {
-    group: "",
-    views: []
-  }
+  selectedGroup: { id: string; base: string; views: string[] } = dumbNode
   selectedEdge: { source: string; target: string; views: string[] } = dumbEdge;
   joinTreeD3 = {};
   contextData: any = {};
@@ -95,12 +95,9 @@ export default class Dataset extends Vue {
     });
   }
 
-  relationClicked(group: string, views: any[]) {
-    console.log({ group, views }, 'clicked');
-    this.selectedGroup = {
-      group,
-      views,
-    }
+  relationClicked(groupID: string) {
+    console.log({ groupID }, 'clicked');
+    this.selectedGroup = joinTreeD3.groupNodes.find((g) => g.id == groupID) || dumbNode;
   }
 
   transitionClicked(source: string, target: string) {
@@ -116,7 +113,7 @@ export default class Dataset extends Vue {
   }
 
   generateCode() {
-    this.$store.commit("SET_TAB", "generateCode");
+    this.$store.commit("SET_TAB", "codeGeneration");
   }
 
   renderD3() {
