@@ -3,86 +3,106 @@
 import {
   mockJoinTree
 } from "./mockdata/mockJoinTree"
-import { view } from "paper"
+import {
+  view
+} from "paper"
 // import _ from lodash
 const _ = require("lodash")
 
-// get the join tree json
-const joinTreeD3 = {
-  ...mockJoinTree,
-  nodes: mockJoinTree.relations.map(relation => {
-    return {id: relation.name}
-  }),
-  links: mockJoinTree.edges.filter(edge => edge.origin !== edge.dest).map(edge => {
-    return {
-      weight: edge.views.length, 
-      views: edge.views,
-      source: edge.origin,
-      target: edge.dest,
-    }
-  }),
-  groupNodes: mockJoinTree.groups.map(group => {
-    return {id: group.name, views: group.views}
-  }),
-  groupEdges: mockJoinTree.groupEdges.map(groupEdge => {
-    return {
-      weight: 1, 
-      views: groupEdge.views,
-      source: groupEdge.origin,
-      target: groupEdge.dest,
-    }
-  }),
-  views: mockJoinTree.views.map(view => {
-    return {
-      name: view.name,
-      title: `View ${view.name}`,
-      expand: true,
-      children: [
-        {
-          title: `Group By Variables`,
-          expand: false,
-          children: view.groupby.map(v => {
-            return {title: v}
-          })
-        },
-        {
-          title: `Aggregates`,
-          expand: false,
-          children: view.aggregates.map(agg => {
-            return {title: `SUM(${agg})`}
-          })
-        }
-      ]
-    }
-  }),
-  queries: mockJoinTree.queries.map(query => {
-    return {
-      ...query,
-      title: `${query.name}`,
-      expand: false,
-      contextmenu: true,
-      children: [
-        {
-          title: `Group By Variables`,
-          expand: false,
-          children: query.groupby.map(v => {
-            return {title: v}
-          })
-        },
-        {
-          title: `Aggregates`,
-          expand: false,
-          children: query.aggregates.map(agg => {
-            return {title: agg}
-          })
-        }
-      ]
-    }
-  })
+const generateJoinTreeD3 = mockJoinTree => {
+  // get the join tree json
+  const joinTreeD3 = {
+    ...mockJoinTree,
+    nodes: mockJoinTree.relations.map(relation => {
+      return {
+        id: relation.name
+      }
+    }),
+    links: mockJoinTree.edges.filter(edge => edge.origin !== edge.dest).map(edge => {
+      return {
+        weight: edge.views.length,
+        views: edge.views,
+        source: edge.origin,
+        target: edge.dest,
+      }
+    }),
+    groupNodes: mockJoinTree.groups.map(group => {
+      return {
+        id: group.name,
+        views: group.views
+      }
+    }),
+    groupEdges: mockJoinTree.groupEdges.map(groupEdge => {
+      return {
+        weight: 1,
+        views: groupEdge.views,
+        source: groupEdge.origin,
+        target: groupEdge.dest,
+      }
+    }),
+    views: mockJoinTree.views.map(view => {
+      return {
+        name: view.name,
+        title: `View ${view.name}`,
+        expand: true,
+        children: [{
+            title: `Group By Variables`,
+            expand: false,
+            children: view.groupby.map(v => {
+              return {
+                title: v
+              }
+            })
+          },
+          {
+            title: `Aggregates`,
+            expand: false,
+            children: view.aggregates.map(agg => {
+              return {
+                title: `SUM(${agg})`
+              }
+            })
+          }
+        ]
+      }
+    }),
+    queries: mockJoinTree.queries.map(query => {
+      return {
+        ...query,
+        title: `${query.name}`,
+        expand: false,
+        contextmenu: true,
+        children: [{
+            title: `Group By Variables`,
+            expand: false,
+            children: query.groupby.map(v => {
+              return {
+                title: v
+              }
+            })
+          },
+          {
+            title: `Aggregates`,
+            expand: false,
+            children: query.aggregates.map(agg => {
+              return {
+                title: agg
+              }
+            })
+          }
+        ]
+      }
+    })
+  }
+
+  return joinTreeD3
 }
 
+
+
 export {
-  joinTreeD3
+  // joinTreeD3,
+  generateJoinTreeD3,
 }
 
 

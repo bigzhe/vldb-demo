@@ -2,7 +2,10 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import axios from 'axios'
 
+const JSON5 = require('json5')
+
 import dataset from "../data/dataset"
+import {generateJoinTreeD3} from "../data/joinTree"
 
 Vue.use(Vuex)
 
@@ -23,6 +26,7 @@ export default new Vuex.Store({
     variables: [],
     matrix: [],
     paramMatrix: [],
+    joinTreeD3: {},
   },
   mutations: {
     SET_PROCESSING(state, processing) {
@@ -97,8 +101,10 @@ export default new Vuex.Store({
       // returns a Promise
       return axios({
         method: 'get',
-        url: ` http://localhost:8081/[${dataset},${model}]`
+        url: ` http://localhost:8081/init/${dataset},${model}`
       }).then(function (response) {
+        const joinTree = JSON5.parse(response.data)
+        state.joinTreeD3 = generateJoinTreeD3(joinTree)
         onSuccess()
       }).catch(err => {
         console.log(err);

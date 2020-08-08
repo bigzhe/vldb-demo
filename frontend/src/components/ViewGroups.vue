@@ -33,7 +33,7 @@
 import { Component, Watch, Vue } from "vue-property-decorator";
 
 // import data
-import { joinTreeD3 } from "../data/joinTree";
+// import { joinTreeD3 } from "../data/joinTree";
 
 // import the visualization function -- d3
 import showJoinTree from "../util/d3/showJoinTree";
@@ -55,11 +55,12 @@ export default class Dataset extends Vue {
     views: []
   }
   selectedEdge: { source: string; target: string; views: string[] } = dumbEdge;
-  joinTreeD3 = joinTreeD3;
+  joinTreeD3 = {};
   contextData: any = {};
   boxHeight:number = (window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight) - 500;
 
   mounted() {
+    this.joinTreeD3 = this.$store.state.joinTreeD3
     this.renderD3();
   }
 
@@ -70,7 +71,7 @@ export default class Dataset extends Vue {
   }
 
   get outputQueries() {
-    return _.groupBy(joinTreeD3.queries, "root");
+    return _.groupBy(this.joinTreeD3.queries, "root");
   }
 
   // http://localhost:8081/regen/[0,1,2,1,3,4,4,3]
@@ -104,7 +105,7 @@ export default class Dataset extends Vue {
 
   transitionClicked(source: string, target: string) {
     this.selectedEdge =
-      joinTreeD3.links.find(
+      this.joinTreeD3.links.find(
         (edge) => edge.source == source && edge.target == target
       ) || dumbEdge;
     console.log(this.selectedEdge);
@@ -120,7 +121,7 @@ export default class Dataset extends Vue {
 
   renderD3() {
     showDependencyGraph(
-      joinTreeD3,
+      this.joinTreeD3,
       "dependencyGraph",
       this.transitionClicked,
       this.relationClicked

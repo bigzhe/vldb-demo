@@ -2,6 +2,50 @@ import { RelationInfo, VariableInfo, Dataset } from "../types/Query"
 
 const dataset: Dataset[] = [
   {
+    name: "example-kmeans",
+    category: "acyclic",
+    dataPrepared: false,
+    variableInfo: {
+      "A": {
+        isCategorical: true,
+        dataType: "int"
+      },
+      "B": {
+        isCategorical: true,
+        dataType: "int"
+      },
+      "C": {
+        isCategorical: true,
+        dataType: "int"
+      },
+      "D": {
+        isCategorical: true,
+        dataType: "int"
+      },
+      "E": {
+        isCategorical: true,
+        dataType: "int"
+      }
+    },
+    relations: [{
+      name: "R",
+      variables: ["A", "B"],
+    },
+    {
+      name: "S",
+      variables: ["B", "C"]
+    },
+    {
+      name: "T",
+      variables: ["C", "D"],
+    },
+    {
+      name: "U",
+      variables: ["D", "E"],
+    }
+    ]
+  },
+  {
     name: "4-path",
     category: "acyclic",
     dataPrepared: false,
