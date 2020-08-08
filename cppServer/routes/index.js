@@ -4,7 +4,7 @@ var router = express.Router();
 const fs = require('fs');
 
 // TODO: Global Variable
-const CPP_FILES_PATH = '../backend/include/application/'
+const CPP_FILES_PATH = '../backend/runtime/'
 
 const Prism = require('prismjs');
 const loadLanguages = require("prismjs/components/");

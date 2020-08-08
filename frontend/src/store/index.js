@@ -68,6 +68,24 @@ export default new Vuex.Store({
     },
   },
   actions: {
+    generateCode({
+      state,
+      commit
+    }, {
+      onSuccess
+    }) {
+
+      // await axios.get
+      // returns a Promise
+      return axios({
+        method: 'get',
+        url: `http://localhost:8081/codegen/`
+      }).then(function (response) {
+        onSuccess()
+      }).catch(err => {
+        console.log(err);
+      });
+    },
     regenerateViews({
       state,
       commit

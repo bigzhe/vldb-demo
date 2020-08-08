@@ -113,7 +113,15 @@ export default class Dataset extends Vue {
   }
 
   generateCode() {
-    this.$store.commit("SET_TAB", "codeGeneration");
+    const self = this;
+    this.$store.dispatch("generateCode", {
+      onSuccess: function () {
+        // on success
+        // console.log("request sent");
+        self.$store.commit("SET_TAB", "codeGeneration");
+      },
+    });
+    
   }
 
   renderD3() {
