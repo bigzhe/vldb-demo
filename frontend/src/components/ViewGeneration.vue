@@ -112,7 +112,7 @@ export default class Dataset extends Vue {
       onSuccess: function () {
         // on success
         // console.log("request sent");
-        this.joinTreeD3 = this.$store.state.joinTreeD3
+        self.joinTreeD3 = self.$store.state.joinTreeD3
         self.renderD3();
       },
     });
@@ -176,7 +176,6 @@ export default class Dataset extends Vue {
 .links line {
   stroke: #999;
   stroke-opacity: 0.6;
-  
 }
 
 #joinTree .links line {
