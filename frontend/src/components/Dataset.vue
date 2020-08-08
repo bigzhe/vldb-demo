@@ -117,7 +117,7 @@ export default class Dataset extends Vue {
       onSuccess: function () {
         // after fetched
 
-        this.$store.commit("SET_TAB", "viewGeneration");
+        self.$store.commit("SET_TAB", "viewGeneration");
       },
     });
   }
