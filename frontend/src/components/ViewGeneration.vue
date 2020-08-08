@@ -96,6 +96,7 @@ export default class Dataset extends Vue {
 
   // http://localhost:8081/regen/[0,1,2,1,3,4,4,3]
   regenerateViews() {
+    const self = this;
     const rootIndicators = this.joinTreeD3.queries.map((query) => {
       const root = query.root;
       const idx = this.joinTreeD3.relations.findIndex((r) => r.name == root);
@@ -110,7 +111,9 @@ export default class Dataset extends Vue {
       rootIndicators,
       onSuccess: function () {
         // on success
-        console.log("request sent");
+        // console.log("request sent");
+        this.joinTreeD3 = this.$store.state.joinTreeD3
+        self.renderD3();
       },
     });
   }
@@ -122,7 +125,7 @@ export default class Dataset extends Vue {
 
   transitionClicked(source: string, target: string) {
     this.selectedEdge =
-      joinTreeD3.links.find(
+      this.joinTreeD3.links.find(
         (edge) => edge.source == source && edge.target == target
       ) || dumbEdge;
     console.log(this.selectedEdge);
@@ -146,8 +149,6 @@ export default class Dataset extends Vue {
         return query;
       }
     });
-
-    // TODO: update the original joinTree
 
     // console.log(joinTreeD3)
   }

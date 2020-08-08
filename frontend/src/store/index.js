@@ -82,7 +82,8 @@ export default new Vuex.Store({
         method: 'get',
         url: ` http://localhost:8081/regen/${rootIndicators.join(',')}`
       }).then(function (response) {
-        console.log(response)
+        const joinTree = JSON5.parse(response.data)
+        state.joinTreeD3 = generateJoinTreeD3(joinTree)
         onSuccess()
       }).catch(err => {
         console.log(err);

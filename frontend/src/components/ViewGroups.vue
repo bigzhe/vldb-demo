@@ -97,7 +97,7 @@ export default class Dataset extends Vue {
 
   relationClicked(groupID: string) {
     console.log({ groupID }, 'clicked');
-    this.selectedGroup = joinTreeD3.groupNodes.find((g) => g.id == groupID) || dumbNode;
+    this.selectedGroup = this.joinTreeD3.groupNodes.find((g) => g.id == groupID) || dumbNode;
   }
 
   transitionClicked(source: string, target: string) {
