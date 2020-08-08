@@ -173,7 +173,7 @@ pre[data-line] {
 	background: linear-gradient(to right, hsla(24, 70%, 50%, .1) 70%, hsla(24, 70%, 50%, 0));
 }
 
-.line-highlight.tag-aggregates {
+.line-highlight.tag-aggregate {
 	background: linear-gradient(to right, rgba(38, 190, 217, 0.1) 70%, hsla(24, 70%, 50%, 0));
 }
 

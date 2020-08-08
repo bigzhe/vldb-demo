@@ -49,7 +49,7 @@ export default class Dataset extends Vue {
   showCode: boolean = true;
   tagLines: string = "";
   dataLines: string = "";
-  tags = ["ALL", "JOIN", "AGGREGATES", "RUNNING SUM", "OUTPUT"];
+  tags = ["ALL", "JOIN", "AGGREGATE", "RUNNING SUM", "OUTPUT"];
 
   mounted() {
     // files
@@ -68,7 +68,7 @@ export default class Dataset extends Vue {
   extractCodeBlocks(code: string) {
     let TAGS =
       this.selectedTag == "ALL"
-        ? ["JOIN", "AGGREGATES", "RUNNING SUM", "OUTPUT"]
+        ? ["JOIN", "AGGREGATE", "RUNNING SUM", "OUTPUT"]
         : [this.selectedTag];
 
     // find the code blocks in code
