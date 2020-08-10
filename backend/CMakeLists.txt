@@ -17,7 +17,7 @@ endif()
 set(CMAKE_CXX_FLAGS_BENCHMARK "${CMAKE_CXX_FLAGS_RELEASE} -DBENCH")
 
 # Set to Debug, Benchmark or Release.
-set(CMAKE_BUILD_TYPE Debug)
+set(CMAKE_BUILD_TYPE Release)
 
 include_directories(include/compiler include/treeDecomposition include/application include/launcher include/templates include/codegen include/utils ../mongoose/mongoose.h /usr/local/include)
 

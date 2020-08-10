@@ -80,6 +80,12 @@ public:
      */
     void generateCode(); 
 
+    /**
+     * Returns the JSON string of the Application
+     */
+    std::string generateApplicationOutput();
+
+
 private:
 
     //! Query Compiler that turns queries into views. 
@@ -103,7 +109,6 @@ private:
     bool launcherInitialized = false; 
 
     bool generateApplicationHandler = false; 
-        
 };
 
 #endif // INCLUDE_RUN_LAUNCHER_H_

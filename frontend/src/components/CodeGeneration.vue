@@ -29,6 +29,9 @@
       </pre>
       </div>
     </div>
+    <Row style="margin-top: 20px;" type="flex" justify="end" :gutter="0">
+        <Button @click="executeCode" type="primary">Execute Code</Button>
+    </Row>
   </div>
 </template>
 
@@ -141,6 +144,18 @@ export default class Dataset extends Vue {
         // console.log(Prism.highlightAll())
       },
     });
+  }
+
+  executeCode() {
+    const self = this;
+    console.log("execute code");
+
+    this.$store.dispatch("executeCode", {
+      onSuccess: function () {
+        // on success
+        self.$store.commit("SET_TAB", "application");
+      },
+    }); 
   }
 
   @Watch("selectedTag", { immediate: true, deep: true })

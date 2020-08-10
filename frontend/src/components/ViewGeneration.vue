@@ -7,13 +7,13 @@
     <br />
     <Row :gutter="20">
       <Col span="12">
-        <h4>Output Queries</h4>
+        <h4 style="display: inline-block;">Output Queries</h4> 
+        <span style="float:right; margin-right: 20px; margin-top: 7px">(Right-click the queries to change their root)</span>
         <div :style="`border: 1px solid gray; padding: 5px; height: ${boxHeight}px; overflow-y: scroll;`">
-          <p>Right-click the queries to change their root</p>
           <div style="margin-top: 5px" :key="relation.id" v-for="relation in joinTreeD3.relations">
             <h5>{{relation.name}}</h5>
             <hr style="margin-top: 5px; margin-bottom: 5px;" />
-            <Tree :data="outputQueries[relation.name]" @on-contextmenu="handleContextMenu">
+            <Tree empty-text="No Queries" :data="outputQueries[relation.name]" @on-contextmenu="handleContextMenu">
               <template slot="contextMenu">
                 <DropdownItem
                   :key="relation.id"

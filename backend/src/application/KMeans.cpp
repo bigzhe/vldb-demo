@@ -7,7 +7,6 @@
 //
 //--------------------------------------------------------------------
 
-
 #include <boost/spirit/include/qi.hpp>
 #include <boost/spirit/include/phoenix_operator.hpp>
 #include <fstream>
@@ -38,7 +37,7 @@ using namespace boost::spirit;
 
 using namespace std;
 
-const bool INCLUDE_EVALUATION = true;
+const bool INCLUDE_EVALUATION = false;
 
 std::unordered_map<size_t, size_t> clusterToVariableMap;
 
@@ -50,7 +49,7 @@ KMeans::KMeans(std::shared_ptr<Launcher> launcher, const size_t k, const size_t 
 
     // This should be modified in case you want to a different k for each dimension
     // _dimensionK = _k;
-    
+
     loadFeatures();
 
     numberOfOriginalVariables = _td->numberOfAttributes();
@@ -63,24 +62,24 @@ KMeans::KMeans(std::shared_ptr<Launcher> launcher, const size_t k, const size_t 
         Attribute* att = _td->getAttribute(var);
         TDNode* node = _td->getRelation(_queryRootIndex[var]);
 
-        if (_isCategoricalFeature[var]) 
-            _td->addAttribute("cluster_"+att->_name,Type::Integer,{true,0.0},node->_id);
+        if (_isCategoricalFeature[var])
+            _td->addAttribute("cluster_"+att->_name, Type::Integer, { true, 0.0 }, node->_id);
         else
-            _td->addAttribute("cluster_"+att->_name,Type::Double,{true,0.0},node->_id);
-            
+            _td->addAttribute("cluster_"+att->_name, Type::Double, { true, 0.0 }, node->_id);
+
         size_t clusterID = _td->numberOfAttributes()-1;
-        
+
         clusterVariables.set(clusterID);
 
         if (_isCategoricalFeature[var])
             _isCategoricalFeature.set(clusterID);
 
-        clusterToVariableMap[clusterID] = var;   
+        clusterToVariableMap[clusterID] = var;
     }
 }
 
 KMeans::~KMeans()
-{    
+{
 }
 
 void KMeans::run()
@@ -102,10 +101,10 @@ void KMeans::modelToQueries()
     query->_rootID = _td->_root->_id;
     query->_fVars = clusterVariables;
 
-    _compiler->addQuery(query);        
+    _compiler->addQuery(query);
     countQuery = query;
 
-    for (size_t var = 0; var < NUM_OF_VARIABLES; ++var) 
+    for (size_t var = 0; var < NUM_OF_VARIABLES; ++var)
     {
         if (!_isFeature[var])
             continue;
@@ -121,16 +120,16 @@ void KMeans::modelToQueries()
         query->_fVars.set(var);
 
         _compiler->addQuery(query);
-        
+
         if (_isCategoricalFeature[var])
         {
             // Categorical variable
-            categoricalQueries.push_back({var,query});
+            categoricalQueries.push_back({ var, query });
         }
         else
         {
             // Continuous variable
-            continuousQueries.push_back({var,query});
+            continuousQueries.push_back({ var, query });
         }
 
         varToQuery[var] = query;
@@ -141,7 +140,7 @@ void KMeans::modelToQueries()
 void KMeans::loadFeatures()
 {
     _queryRootIndex = new size_t[NUM_OF_VARIABLES]();
-    
+
     /* Load the two-pass variables config file into an input stream. */
     ifstream input(FEATURE_CONF);
 
@@ -157,7 +156,7 @@ void KMeans::loadFeatures()
 
     int numOfFeatures = 0;
     int degreeOfInteractions = 0;
-    
+
     /* Ignore comment and empty lines at the top */
     while (getline(input, line))
     {
@@ -166,23 +165,23 @@ void KMeans::loadFeatures()
 
         break;
     }
-    
-    /* 
-     * Extract number of labels, features and interactions from the config. 
-     * Parse the line with the three numbers; ignore spaces. 
+
+    /*
+     * Extract number of labels, features and interactions from the config.
+     * Parse the line with the three numbers; ignore spaces.
      */
     bool parsingSuccess =
         qi::phrase_parse(line.begin(), line.end(),
-                         /* Begin Boost Spirit grammar. */
-                         ((qi::int_[phoenix::ref(numOfFeatures) = qi::_1])
-                          >> NUMBER_SEPARATOR_CHAR
-                          >> (qi::int_[phoenix::ref(degreeOfInteractions) =
-                                       qi::_1])),
-                         /*  End grammar. */
-                         ascii::space);
+            /* Begin Boost Spirit grammar. */
+            ((qi::int_[phoenix::ref(numOfFeatures) = qi::_1])
+                >> NUMBER_SEPARATOR_CHAR
+                >> (qi::int_[phoenix::ref(degreeOfInteractions) =
+                    qi::_1])),
+            /*  End grammar. */
+            ascii::space);
 
     assert(parsingSuccess && "The parsing of the features file has failed.");
-    
+
     /* Read in the features. */
     for (int featureNo = 0; featureNo < numOfFeatures; ++featureNo)
     {
@@ -194,7 +193,7 @@ void KMeans::loadFeatures()
         }
 
         ssLine << line;
- 
+
         string attrName;
         /* Extract the name of the attribute in the current line. */
         getline(ssLine, attrName, ATTRIBUTE_NAME_CHAR);
@@ -208,7 +207,7 @@ void KMeans::loadFeatures()
         getline(ssLine, rootName, ATTRIBUTE_NAME_CHAR);
 
         int attributeID = _td->getAttributeIndex(attrName);
-        int categorical = stoi(typeOfFeature); 
+        int categorical = stoi(typeOfFeature);
         int rootID = _td->getRelationIndex(rootName);
 
         if (attributeID == -1)
@@ -227,9 +226,9 @@ void KMeans::loadFeatures()
 
         if (categorical)
             _isCategoricalFeature.set(attributeID);
-        
+
         _queryRootIndex[attributeID] = rootID;
-        
+
         /* Clear string stream. */
         ssLine.clear();
     }
@@ -248,8 +247,10 @@ void KMeans::generateCode()
         offset(2)+"kMeans();\n\n"+
         offset(2)+"int64_t endProcess = duration_cast<milliseconds>("+
         "system_clock::now().time_since_epoch()).count()-startProcess;\n"+
-        offset(2)+"std::cout << \"Run Application: \"+"+
-        "std::to_string(endProcess)+\"ms.\\n\";\n\n"+
+        // offset(2)+"std::cout << \"Run Application: \"+"+
+        // "std::to_string(endProcess)+\"ms.\\n\";\n\n"+
+        offset(2)+"std::cout << \"   appComputeTime: \"+"+
+        "std::to_string(endProcess)+\",\\n\";\n\n"+
         offset(2)+"std::ofstream ofs(\"times.txt\",std::ofstream::out | " +
         "std::ofstream::app);\n"+
         offset(2)+"ofs << \"\\t\" << endProcess << std::endl;\n"+
@@ -273,25 +274,25 @@ void KMeans::generateCode()
         offset(2)+"ofs.close();\n"+
         offset(2)+"std::cout << sum << std::endl;\n"+"#endif\n"+
         offset(1)+"}\n";
-    
+
     std::ofstream ofs(multifaq::dir::OUTPUT_DIRECTORY+"/ApplicationHandler.h", std::ofstream::out);
     ofs << "#ifndef INCLUDE_APPLICATIONHANDLER_HPP_\n"
         << "#define INCLUDE_APPLICATIONHANDLER_HPP_\n\n"
         << "#include \"DataHandler.h\"\n\n"
         << "namespace lmfao\n{\n"
         << offset(1)+"void runApplication();\n"
-        << "}\n\n#endif /* INCLUDE_APPLICATIONHANDLER_HPP_*/\n";    
+        << "}\n\n#endif /* INCLUDE_APPLICATIONHANDLER_HPP_*/\n";
     ofs.close();
 
     ofs.open(multifaq::dir::OUTPUT_DIRECTORY+"/ApplicationHandler.cpp", std::ofstream::out);
-    
+
     ofs << "#include \"ApplicationHandler.h\"\n";
 
     if (INCLUDE_EVALUATION)
         ofs << "#include <boost/spirit/include/qi.hpp>\n"
-            << "#include <boost/spirit/include/phoenix_operator.hpp>\n"
-            << "namespace qi = boost::spirit::qi;\n"
-            << "namespace phoenix = boost::phoenix;\n\n";
+        << "#include <boost/spirit/include/phoenix_operator.hpp>\n"
+        << "namespace qi = boost::spirit::qi;\n"
+        << "namespace phoenix = boost::phoenix;\n\n";
 
     std::shared_ptr<CppGenerator> cppGenerator =
         std::dynamic_pointer_cast<CppGenerator> (_launcher->getCodeGenerator());
@@ -319,7 +320,7 @@ std::string KMeans::genKMeansFunction()
     std::string gridViewName = "V"+std::to_string(gridViewID);
     View* gridView = _compiler->getView(gridViewID);
 
-    const std::string numCategVar = std::to_string(_isCategoricalFeature.count()/2); 
+    const std::string numCategVar = std::to_string(_isCategoricalFeature.count()/2);
 
     std::string returnString = "\n";
 
@@ -346,11 +347,11 @@ std::string KMeans::genKMeansFunction()
 
     // If we are gcc, we can use openmp to paralellize the computation do loop
     // for KMeans
-#if USE_OMP 
+    #if USE_OMP 
 
     size_t nthreads = std::thread::hardware_concurrency();
     std::string nthreadString = std::to_string(nthreads);
-    
+
     // Open do loop
     returnString += offset(2)+"Cluster_mean localClusterSums[k*"+
         nthreadString+"] = {};\n"+
@@ -399,7 +400,7 @@ std::string KMeans::genKMeansFunction()
 
     clusterCount += ";\n";
     clusterChange += ";\n";
-    
+
     std::string contLocalUpdates = "", categLocalUpdates = "";
 
     // Compute the one-hot encoding for each categorical variable 
@@ -412,16 +413,16 @@ std::string KMeans::genKMeansFunction()
 
             if (_isCategoricalFeature[var])
             {
-                const size_t& origVar = clusterToVariableMap[var];                
+                const size_t& origVar = clusterToVariableMap[var];
                 const size_t origViewID =
                     varToQuery[origVar]->_aggregates[0]->_incoming[0].first;
                 const std::string origView = "V"+std::to_string(origViewID);
-                
+
                 categLocalUpdates +=
                     offset(4)+"for (size_t i = 0; i < "+origView+".size(); ++i)\n"+
                     offset(6)+"means[cluster]."+attName+"[i] = (";
 
-                  for (size_t thread = 0; thread < nthreads; ++thread)
+                for (size_t thread = 0; thread < nthreads; ++thread)
                 {
                     categLocalUpdates += "localClusterSums["+std::to_string(thread)+
                         "*k+cluster]."+attName+"[i]+";
@@ -442,13 +443,13 @@ std::string KMeans::genKMeansFunction()
             }
         }
     }
-        
+
     returnString += offset(3)+"// Combine the clusters and update mean\n"+
         offset(3)+clusterChange+
         offset(3)+"for (size_t cluster = 0; cluster < k; ++cluster)\n"+offset(3)+"{\n"+
         offset(4)+clusterCount+contLocalUpdates+categLocalUpdates+offset(3)+"}\n";
-    
-#else // If we are on clang and cannot use openmp
+
+    #else // If we are on clang and cannot use openmp
 
     // Open do loop
     returnString +=
@@ -481,6 +482,7 @@ std::string KMeans::genKMeansFunction()
         offset(5)+"continue;\n";
 
     std::string categUpdates = "";
+
     // Compute the one-hot encoding for each categorical variable 
     for (size_t var=0; var < NUM_OF_VARIABLES; ++var)
     {
@@ -491,11 +493,11 @@ std::string KMeans::genKMeansFunction()
 
             if (_isCategoricalFeature[var])
             {
-                const size_t& origVar = clusterToVariableMap[var];                
+                const size_t& origVar = clusterToVariableMap[var];
                 const size_t origViewID =
                     varToQuery[origVar]->_aggregates[0]->_incoming[0].first;
                 const std::string origView = "V"+std::to_string(origViewID);
-                
+
                 categUpdates +=
                     offset(4)+"for (size_t i = 0; i < "+origView+".size(); ++i)\n"+
                     offset(6)+"means[cluster]."+attName+"[i] = "+
@@ -511,28 +513,31 @@ std::string KMeans::genKMeansFunction()
     }
 
     returnString += categUpdates+offset(3)+"}\n";
-#endif
+    #endif
 
     // returnString += 
     // "//TODO:TODO:check dispersion of the clusters and if clusters have converged\n";
 
     returnString += offset(3)+"++iteration;\n"+
-      offset(2)+"} while(clustersChanged && iteration < 1000);\n\n"+
-      offset(2)+"int64_t endProcess = duration_cast<milliseconds>("+
-      "system_clock::now().time_since_epoch()).count()-startProcess;\n"+
-      offset(2)+"std::ofstream ofs(\"times.txt\",std::ofstream::out | "+
-      "std::ofstream::app);\n"+
-      offset(2)+"ofs << \"\\t\" << endInit << \"\\t\" << endProcess << \"\\t\" << iteration;\n"+
-      offset(2)+"ofs.close();\n\n"+
-      offset(2)+"std::cout << \"Kmeans Init: \"+"+
-      "std::to_string(endInit)+\"ms.\\n\";\n"+
-      offset(2)+"std::cout << \"Run kMeans: \"+"+
-      "std::to_string(endProcess)+\"ms.\\n\";\n\n";// +
+        offset(2)+"} while(clustersChanged && iteration < 1000);\n\n"+
+        offset(2)+"int64_t endProcess = duration_cast<milliseconds>("+
+        "system_clock::now().time_since_epoch()).count()-startProcess;\n"+
+        offset(2)+"std::ofstream ofs(\"times.txt\",std::ofstream::out | "+
+        "std::ofstream::app);\n"+
+        offset(2)+"ofs << \"\\t\" << endInit << \"\\t\" << endProcess << \"\\t\" << iteration;\n"+
+        offset(2)+"ofs.close();\n\n";
+        // offset(2)+"std::cout << \"Kmeans Init: \"+"+
+        // "std::to_string(endInit)+\"ms.\\n\";\n"+
+        // offset(2)+"std::cout << \"Run kMeans: \"+"+
+        // "std::to_string(endProcess)+\"ms.\\n\";\n\n";// +
         // offset(2)+"std::cout << \"Number of Iterations: \"+"+
         // "std::to_string(iteration)+\"\\n\";\n\n";
-    
+
     if (INCLUDE_EVALUATION)
         returnString += offset(2)+"evaluateModel(means);\n";
+
+    returnString += generateOutputFunction(); 
+
     return returnString+offset(1)+"}\n\n";
 }
 
@@ -541,7 +546,7 @@ std::string KMeans::genModelEvaluationFunction()
 {
     std::string attributeString = "",
         attrConstruct = offset(4)+"qi::phrase_parse(tuple.begin(),tuple.end(),";
-    
+
     for (size_t var = 0; var < numberOfOriginalVariables; ++var)
     {
         Attribute* att = _td->getAttribute(var);
@@ -580,12 +585,12 @@ std::string KMeans::genModelEvaluationFunction()
 
         Attribute* att = _td->getAttribute(var);
         std::string& varName = att->_name;
-        
+
         if (_isCategoricalFeature[var])
         {
             const std::string& viewName = "V"+std::to_string(
                 varToQuery[var]->_aggregates[0]->_incoming[0].first);
-            
+
             distance += "-2*means[cluster].cluster_"+varName+"["+
                 varName+"_clusterIndex[tuple."+varName+"]]";
 
@@ -599,10 +604,10 @@ std::string KMeans::genModelEvaluationFunction()
         }
         else
             distance += "+((tuple."+att->_name+"-means[cluster].cluster_"+att->_name+")"+
-                "*(tuple."+att->_name+"-means[cluster].cluster_"+att->_name+"))";
+            "*(tuple."+att->_name+"-means[cluster].cluster_"+att->_name+"))";
     }
-    
-    std::string numCategVar = std::to_string(_isCategoricalFeature.count()/2); 
+
+    std::string numCategVar = std::to_string(_isCategoricalFeature.count()/2);
 
     std::string precompMeanSum = "";
     for (size_t var = 0; var < NUM_OF_VARIABLES; ++var)
@@ -620,12 +625,12 @@ std::string KMeans::genModelEvaluationFunction()
         //     Offset(2)+"{\N"+offset(3)+"for (size_t i = 0; i < "+origView+".size(); ++i)\n"+
         //     offset(4)+"sum_mean_squared[idx] += std::pow(means[cluster]."
         //     +attName+"[i],2);\n"+offset(3)+"++idx;\n"+offset(2)+"}\n\n";
-        
+
         precompMeanSum += offset(3)+"for (size_t i = 0; i < "+origView+".size(); ++i)\n"+
             offset(4)+"sum_mean_squared[cluster] += std::pow(mean_tuple."
             +attName+"[i],2);\n\n";
     }
-    
+
     std::string evalFunction = offset(1)+"void evaluateModel(Cluster_mean* means)\n"+
         offset(1)+"{\n"+
         offset(2)+"std::vector<Test_tuple> TestDataset;\n"+
@@ -678,23 +683,22 @@ std::string KMeans::genClusterTuple()
 
     size_t categVarIndex = 0;
 
-    std::string numCategVar = std::to_string(_isCategoricalFeature.count()/2); 
-    
+    std::string numCategVar = std::to_string(_isCategoricalFeature.count()/2);
+
     for (size_t var=0; var < NUM_OF_VARIABLES; ++var)
     {
         if (gridView->_fVars[var])
         {
             Attribute* att = _td->getAttribute(var);
             const std::string& attName = att->_name;
-            
+
             if (_isCategoricalFeature[var])
             {
                 const size_t& origVar = clusterToVariableMap[var];
                 const size_t origViewID =
                     varToQuery[origVar]->_aggregates[0]->_incoming[0].first;
                 const std::string origView = "V"+std::to_string(origViewID);
-                const std::string& origAtt = _td->getAttribute(origVar)->_name;
-                
+
                 varList += offset(2)+"double* "+attName+" = nullptr;\n";
                 initList += offset(3)+attName+" = new double["+origView+".size()]();\n";
                 deleteList += offset(3)+"delete[] "+attName+";\n";
@@ -710,14 +714,14 @@ std::string KMeans::genClusterTuple()
                     offset(5)+attName+"[t] += "+origView+"[t].aggregates[0] * "+
                     "tuple.aggregates[0];\n";
 
- 		setList += offset(3)+"if (tuple."+attName+" != "+
+                setList += offset(3)+"if (tuple."+attName+" != "+
                     std::to_string(_dimensionK-1)+")\n"+
                     offset(4)+attName+"[tuple."+attName+"] = 1;\n"+
                     offset(3)+"else\n"+
                     offset(4)+"for (size_t t = "+std::to_string(_dimensionK-1)+"; "+
                     "t < "+origView+".size(); ++t)\n"+
                     offset(5)+attName+"[t] = "+origView+"[t].aggregates[0];\n";
-                
+
                 // setList +=
                 //     offset(3)+"for (size_t t = 0; t < "+origView+".size(); ++t)\n"+
                 //     offset(4)+"if (tuple."+attName+" == "+origView+"[t]."+origAtt+")\n"+
@@ -730,7 +734,7 @@ std::string KMeans::genClusterTuple()
                 // std::to_string(categVarIndex)+" * k) + cluster] + distance_to_mean[("+
                 //     numCategVar+"+"+std::to_string(categVarIndex)+"*k)*k + tuple."+
                 //     attName+"];\n";
-                
+
                 rsumList += "\n"+offset(2)+
                     "for(size_t cluster = 0; cluster < k; ++cluster)\n"+
                     offset(2)+"{\n"+
@@ -783,7 +787,7 @@ std::string KMeans::genClusterTuple()
             }
         }
     }
-    
+
     return offset(1)+"struct Cluster_mean\n"+offset(1)+"{\n"+varList+
         offset(2)+"size_t count = 0;\n\n"+
         offset(2)+"Cluster_mean()\n"+offset(2)+"{\n"+initList+offset(2)+"}\n\n"+
@@ -811,16 +815,16 @@ std::string KMeans::genClusterTuple()
 
 std::string KMeans::genComputeGridPointsFunction()
 {
-#if defined(__GNUC__) && defined(NDEBUG) && !defined(__clang__)
+    #if defined(__GNUC__) && defined(NDEBUG) && !defined(__clang__)
     std::string sortAlgo = "__gnu_parallel::sort(";
-#else
+    #else
     std::string sortAlgo = "std::sort(";
-#endif
+    #endif
 
     std::string kString = std::to_string(_dimensionK);
-    
+
     // Get view for count query
-    const std::pair<size_t,size_t>& countViewAggPair =
+    const std::pair<size_t, size_t>& countViewAggPair =
         countQuery->_aggregates[0]->_incoming[0];
     const View* countView = _compiler->getView(countViewAggPair.first);
     std::string countViewName = "V"+std::to_string(countViewAggPair.first);
@@ -828,9 +832,10 @@ std::string KMeans::genComputeGridPointsFunction()
     std::string returnString = genClusterTuple();
 
     if (INCLUDE_EVALUATION)
-         returnString += genModelEvaluationFunction();
-    returnString += genKMeansFunction();
+        returnString += genModelEvaluationFunction();
     
+    returnString += genKMeansFunction();
+
     if (!continuousQueries.empty())
     {
         // Define the auxhiliary arrays
@@ -892,17 +897,17 @@ std::string KMeans::genComputeGridPointsFunction()
 
         returnString += offset(1)+"}\n\n";
     }
-    
+
     returnString += offset(1)+"void computeGrid()\n"+offset(1)+"{\n"+
         offset(2)+"int64_t endProcess, endClustering;\n"+
         offset(2)+"int64_t startProcess = duration_cast<milliseconds>("+
         "system_clock::now().time_since_epoch()).count();\n\n"+
         offset(2)+"size_of_query_result = "+countViewName+"[0].aggregates[0];\n";
-    
+
     for (auto& varQueryPair : categoricalQueries)
-    {        
+    {
         // Get view for this query
-        std::pair<size_t,size_t>& viewAggPair =
+        std::pair<size_t, size_t>& viewAggPair =
             varQueryPair.second->_aggregates[0]->_incoming[0];
 
         std::string viewName = "V"+std::to_string(viewAggPair.first);
@@ -910,7 +915,7 @@ std::string KMeans::genComputeGridPointsFunction()
         std::string& varName = att->_name;
 
         returnString += "\n"+offset(2)+"// For categorical variable "+varName+"\n";
-        
+
         // Sort the view on the count
         returnString += offset(2)+sortAlgo+viewName+".begin(),"+
             viewName+".end(),[ ](const "+viewName+"_tuple& lhs, const "+viewName+
@@ -927,20 +932,21 @@ std::string KMeans::genComputeGridPointsFunction()
         //     offset(2)+"for (size_t l=k-1; l<"+viewName+".size(); ++l)\n"+
         //     offset(3)+varName+"_clusters["+viewName+"[l]."+varName+"] = k-1;\n";
     }
-    
+
     std::string maxString = "", offsetArrays = "", meanArrays = "";
     for (auto& varQueryPair : continuousQueries)
     {
         // Get view for this query
-        const std::pair<size_t,size_t>& viewAggPair =
+        const std::pair<size_t, size_t>& viewAggPair =
             varQueryPair.second->_aggregates[0]->_incoming[0];
-        
+
         maxString +=  "V"+std::to_string(viewAggPair.first)+".size(),";
         offsetArrays +=
             _td->getAttribute(varQueryPair.first)->_name+"_offsets["+
             kString+"] = {},";
         meanArrays += _td->getAttribute(varQueryPair.first)->_name+"_means["+
-            kString+"] = {},";    }
+            kString+"] = {},";
+    }
 
     if (!continuousQueries.empty())
     {
@@ -961,14 +967,14 @@ std::string KMeans::genComputeGridPointsFunction()
             offset(2)+"{\n"+
             offset(3)+"D_matrix[i] = new double[max_size+1]();\n"+
             offset(3)+"T_matrix[i] = new size_t[max_size+1]();\n"+
-            offset(2)+"}\n";        
+            offset(2)+"}\n";
     }
-    
-    
+
+
     for (auto& varQueryPair : continuousQueries)
     {
         // Get view for this query
-        const std::pair<size_t,size_t>& viewAggPair =
+        const std::pair<size_t, size_t>& viewAggPair =
             varQueryPair.second->_aggregates[0]->_incoming[0];
 
         std::string viewName = "V"+std::to_string(viewAggPair.first);
@@ -977,8 +983,8 @@ std::string KMeans::genComputeGridPointsFunction()
 
         returnString += "\n"+offset(2)+"if("+viewName+".size() <= "+
             kString+")\n"+
-            offset(2)+"{\n"+offset(3)+"std::cout << \""+varName+
-            " has less values than "+kString+";\" << std::endl;\n"+
+            offset(2)+"{\n"+
+            // offset(3)+"std::cout << \""+varName+" has less values than "+kString+";\" << std::endl;\n"+
             offset(3)+"for (size_t t = 0; t < "+viewName+".size(); ++t)\n"+
             offset(3)+"{\n"+
             offset(4)+varName+"_offsets[t] = t;\n"+
@@ -1021,10 +1027,10 @@ std::string KMeans::genComputeGridPointsFunction()
     for (size_t rel = 0; rel < _td->numberOfRelations(); ++rel)
     {
         TDNode* relation = _td->getRelation(rel);
-        
+
         returnString += offset(2)+"for ("+relation->_name+"_tuple& tup : "+
             relation->_name+")\n"+offset(2)+"{\n";
-        
+
         for (size_t var = 0; var < NUM_OF_VARIABLES; ++var)
         {
             if (!clusterVariables[var])
@@ -1039,20 +1045,20 @@ std::string KMeans::genComputeGridPointsFunction()
 
                 const size_t origViewID =
                     varToQuery[origVar]->_aggregates[0]->_incoming[0].first;
-                
+
                 if (_isCategoricalFeature[var])
                 {
                     std::string updateFunction = "(tup."+origAtt->_name+" == "+
                         "V"+std::to_string(origViewID)+"["+std::to_string(_dimensionK-2)+"]."+
                         origAtt->_name+" ? "+std::to_string(_dimensionK-2)+" : "+
-                        std::to_string(_dimensionK-1)+")"; 
-                    
+                        std::to_string(_dimensionK-1)+")";
+
                     for (int c = _dimensionK-3; c >= 0; --c)
                     {
-                       updateFunction = "(tup."+origAtt->_name+" == "+
-                           "V"+std::to_string(origViewID)+"["+std::to_string(c)+"]."+
-                           origAtt->_name+" ? "+std::to_string(c)+" : "+
-                           updateFunction+")";
+                        updateFunction = "(tup."+origAtt->_name+" == "+
+                            "V"+std::to_string(origViewID)+"["+std::to_string(c)+"]."+
+                            origAtt->_name+" ? "+std::to_string(c)+" : "+
+                            updateFunction+")";
                     }
 
                     returnString += offset(3)+"tup."+clusterAtt->_name+" = "+
@@ -1061,7 +1067,7 @@ std::string KMeans::genComputeGridPointsFunction()
                 else
                 {
                     const std::string& attName = origAtt->_name;
-                    
+
                     // compare value to each threshold and set k accordingly
                     std::string updateFunction = "(tup."+attName+" < "+
                         "V"+std::to_string(origViewID)+"["+
@@ -1072,13 +1078,13 @@ std::string KMeans::genComputeGridPointsFunction()
 
                     for (int c = _dimensionK-3; c >= 0; --c)
                     {
-                       updateFunction = "(tup."+origAtt->_name+" < "+
-                           "V"+std::to_string(origViewID)+"["+
-                           attName+"_offsets["+std::to_string(c+1)+"]]."+attName+" ? "+
-                           attName+"_means["+std::to_string(c)+"] : "+
-                           updateFunction+")";
+                        updateFunction = "(tup."+origAtt->_name+" < "+
+                            "V"+std::to_string(origViewID)+"["+
+                            attName+"_offsets["+std::to_string(c+1)+"]]."+attName+" ? "+
+                            attName+"_means["+std::to_string(c)+"] : "+
+                            updateFunction+")";
                     }
-                     
+
                     returnString += offset(3)+"tup."+clusterAtt->_name+" = "+
                         updateFunction+" ;\n";
                 }
@@ -1100,16 +1106,16 @@ std::string KMeans::genComputeGridPointsFunction()
         offset(2)+"delete[] psum_linear;\n"+
         offset(2)+"delete[] psum_quad;\n"+
         offset(2)+"delete[] rsum_count;\n\n";
-    
+
     bool containsView = true;
 
     std::shared_ptr<CppGenerator> cppGenerator =
         std::dynamic_pointer_cast<CppGenerator> (_launcher->getCodeGenerator());
-            
-    boost::dynamic_bitset<> recomputedGroups(cppGenerator->numberOfGroups());   
+
+    boost::dynamic_bitset<> recomputedGroups(cppGenerator->numberOfGroups());
     boost::dynamic_bitset<> intermediateViews(_compiler->numberOfViews());
     boost::dynamic_bitset<> recomputedViews(_compiler->numberOfViews());
-    
+
     for (size_t group = 0; group < cppGenerator->numberOfGroups(); ++group)
     {
         containsView = false;
@@ -1124,10 +1130,10 @@ std::string KMeans::genComputeGridPointsFunction()
 
             View* v = _compiler->getView(view);
             if (v->_origin != v->_destination)
-            {    
+            {
                 intermediateViews.set(view);
             }
-            
+
         }
 
         if (containsView)
@@ -1141,9 +1147,9 @@ std::string KMeans::genComputeGridPointsFunction()
     {
         if (intermediateViews[view] && !recomputedViews[view])
             returnString += offset(2)+"std::vector<V"+std::to_string(view)+"_tuple>()"+
-                ".swap(V"+std::to_string(view)+");\n";
+            ".swap(V"+std::to_string(view)+");\n";
     }
-    
+
     // for (size_t rel = 0; rel < _td->numberOfRelations(); ++rel)
     // {
     //     TDNode* node = _td->getRelation(rel);
@@ -1152,14 +1158,14 @@ std::string KMeans::genComputeGridPointsFunction()
 
     returnString += offset(2)+"startProcess = duration_cast<milliseconds>("+
         "system_clock::now().time_since_epoch()).count();\n\n";
-    
-        
+
+
     // clear views and re-compute the groups that are need to compute grid 
     for (size_t group = 0; group < cppGenerator->numberOfGroups(); ++group)
     {
         if (recomputedGroups[group])
         {
-            for  (const size_t& view : cppGenerator->getGroup(group))
+            for (const size_t& view : cppGenerator->getGroup(group))
                 returnString += offset(2)+"V"+std::to_string(view)+".clear();\n";
 
             returnString += offset(2)+"computeGroup"+std::to_string(group)+"();\n";
@@ -1167,10 +1173,10 @@ std::string KMeans::genComputeGridPointsFunction()
     }
 
     // We resort categorical variables and set their aggregates to the one-hot encoding
-    if(_isCategoricalFeature.any())
+    if (_isCategoricalFeature.any())
     {
         returnString += offset(2)+"double last_cluster_size;\n";
-    
+
         // Compute the one-hot encoding for each categorical variable 
         for (size_t var=0; var < NUM_OF_VARIABLES; ++var)
         {
@@ -1188,14 +1194,14 @@ std::string KMeans::genComputeGridPointsFunction()
 
                 returnString += "\n"+offset(2)+
                     "// For categorical variable "+origAttName+"\n";
-        
+
                 // Sort the view on the count
                 returnString += offset(2)+sortAlgo+origView+".begin(),"+
                     origView+".end(),[ ](const "+origView+"_tuple& lhs, const "+origView+
                     "_tuple& rhs)\n"+offset(2)+"{\n"+
                     offset(3)+"return lhs.aggregates[0] < rhs.aggregates[0];\n"+
                     offset(2)+"});\n";
-            
+
                 returnString += offset(2)+"// one-hot encoding for "+attName+"\n"+
                     offset(2)+"last_cluster_size = size_of_query_result;\n"+
                     offset(2)+"for (size_t t = 0; t < "+origView+".size(); ++t)\n"+
@@ -1211,7 +1217,7 @@ std::string KMeans::genComputeGridPointsFunction()
             }
         }
     }
-    
+
     returnString += "\n"+offset(2)+"endProcess = duration_cast<milliseconds>("+
         "system_clock::now().time_since_epoch()).count()-startProcess;\n\n"+
         // offset(2)+"endClustering -= startProcess;\n\n"+
@@ -1220,12 +1226,14 @@ std::string KMeans::genComputeGridPointsFunction()
         offset(2)+"ofs << \"\\t\" << endClustering << \"\\t\" "+
         "<< endProcess << \"\\t\" << "+countViewName+".size();\n"+
         offset(2)+"ofs.close();\n\n"+
-        offset(2)+"std::cout << \"Clustering Dimensions: \"+"+
-        "std::to_string(endClustering)+\"ms.\\n\";\n"+
-        offset(2)+"std::cout << \"Compute Grid: \"+"+
-        "std::to_string(endProcess)+\"ms.\\n\";\n"+
-        offset(2)+"std::cout << \"Size of Grid: \" << "+
-        countViewName+".size() << \" points.\\n\";\n";
+        // offset(2)+"std::cout << \"Clustering Dimensions: \"+"+
+        // "std::to_string(endClustering)+\"ms.\\n\";\n"+
+        // offset(2)+"std::cout << \"Compute Grid: \"+"+
+        // "std::to_string(endProcess)+\"ms.\\n\";\n"+
+        // offset(2)+"std::cout << \"Size of Grid: \" << "+
+        // countViewName+".size() << \" points.\\n\";\n"+
+        offset(2)+"std::cout << \"   coresetSize: \" << "+
+        countViewName+".size() << \",\\n\";\n";
 
     return returnString+offset(1)+"}\n\n";
 }
@@ -1244,24 +1252,24 @@ std::string KMeans::genClusterInitialization(const std::string& gridName)
     {
         std::cout << "INFO: No cluster initialization file provided. \n";
         std::cout << "INFO: We will use Kmeans++ Initialization instead. \n";
-        
+
         return offset(2)+"// Initialize the means\n\n"+
             offset(2)+"std::srand (time(NULL));\n\n"+
-	  offset(2)+"double randomVal = (double)(rand() % (size_t)size_of_query_result);\n"+
-	  offset(2)+"double count = 0.0;\n"+
-	  offset(2)+"size_t pos = 0;\n"+
-	  offset(2)+"while (randomVal < count)\n"+
-	  offset(2)+"{\n"+
-	  offset(3)+"count += "+gridName+"[pos].aggregates[0];\n"+
-	  offset(3)+"++pos;\n"+
-	  offset(2)+"}\n"+
-	  offset(2)+"means[0] = "+gridName+"[pos];\n"+
+            offset(2)+"double randomVal = (double)(rand() % (size_t)size_of_query_result);\n"+
+            offset(2)+"double count = 0.0;\n"+
+            offset(2)+"size_t pos = 0;\n"+
+            offset(2)+"while (randomVal < count)\n"+
+            offset(2)+"{\n"+
+            offset(3)+"count += "+gridName+"[pos].aggregates[0];\n"+
+            offset(3)+"++pos;\n"+
+            offset(2)+"}\n"+
+            offset(2)+"means[0] = "+gridName+"[pos];\n"+
             // offset(2)+"means[0] = "+gridName+"[rand() % grid_size];\n\n"+
             offset(2)+"std::vector<double> distribution(grid_size,0.0);\n"+
             offset(2)+"for (size_t i = 1; i < k; ++i)\n"+offset(2)+"{\n"+
             offset(3)+"computeMeanDistance(&distance_to_mean[0], &means[0]);\n"+
             offset(3)+"double dist_sum = 0.0;\n"+
-	  offset(3)+"#pragma omp parallel for num_threads(32) private(min_dist,dist) shared(distribution) reduction(+:dist_sum)\n"+
+            offset(3)+"#pragma omp parallel for num_threads(32) private(min_dist,dist) shared(distribution) reduction(+:dist_sum)\n"+
             offset(3)+"for (size_t tup = 0; tup < grid_size; ++tup)\n"+
             offset(3)+"{\n"+
             offset(4)+"min_dist = std::numeric_limits<double>::max();\n"+
@@ -1288,8 +1296,8 @@ std::string KMeans::genClusterInitialization(const std::string& gridName)
             offset(4)+"pos++;\n"+
             offset(3)+"means[i] = "+gridName+"[pos];\n"+
             offset(2)+"}\n"+
-	  offset(2)+"int64_t endInit = duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count()-startProcess;\n"+
-	  offset(2)+"startProcess = duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count();\n";
+            offset(2)+"int64_t endInit = duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count()-startProcess;\n"+
+            offset(2)+"startProcess = duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count();\n";
     }
     else
     {
@@ -1308,13 +1316,13 @@ std::string KMeans::genClusterInitialization(const std::string& gridName)
     }
 
     std::string returnString = offset(2)+"// Initialize the means\n";
-    
+
     for (size_t str = 0; str < std::min(initList.size(), _k); ++str)
     {
         returnString += offset(2)+"means["+std::to_string(str)+"] = "+
             initList[str];
     }
-    
+
     if (initList.size() < _k)
     {
         returnString += offset(2)+"for (size_t cluster = "+
@@ -1322,6 +1330,114 @@ std::string KMeans::genClusterInitialization(const std::string& gridName)
             offset(3)+"means[cluster] += "+gridName+"[rand() % "+
             gridName+".size()];\n\n";
     }
-    
+
+    return returnString;
+}
+
+std::string KMeans::generateOutputColumns()
+{
+    std::string returnString = 
+        offset(1)+"columns : [\n"+
+        offset(2)+"{\n"+
+        offset(3)+"title: \"Attribute\",\n"+
+        offset(3)+"key: \"attrtibute\",\n"+
+        offset(3)+"slot: \"name\",\n"+
+        offset(3)+"width: 125,\n"+
+        offset(3)+"fixed: \"left\",\n"+  
+        offset(2)+"},\n"+
+        offset(2)+"{\n"+
+        offset(3)+"title: \"Data Point\",\n"+
+        offset(3)+"key: \"point\",\n"+
+        offset(3)+"slot: \"point\",\n"+
+        offset(3)+"width: 145,\n"+
+        offset(3)+"fixed: \"left\",\n"+  
+        offset(3)+"align: \"center\",\n"+
+        offset(3)+"className: 'demo-table-info-column'\n"+
+        offset(2)+"},\n";
+
+    for (size_t c = 0; c < _k; ++c)
+    {
+        returnString += 
+            offset(2)+"{\n"+
+            offset(3)+"title: \"Cluster "+std::to_string(c+1)+"\",\n"+
+            offset(3)+"key: \"c"+std::to_string(c)+"\",\n"+
+            offset(3)+"className: 'normal-table-column'\n"+
+            offset(2)+"},\n"; 
+    }
+    return returnString+offset(1)+"],\n"; 
+}
+
+// std::string KMeans::generateOutputData(std::vector<std::vector<double>> &clusters)
+// {
+//     std::string returnString = offset(1)+"data : [\n";
+//     for (size_t v = 0; v < _td->numberOfAttributes(); ++v)
+//     {
+//         Attribute* attr = _td->getAttribute(v);
+//         returnString += offset(2)+"{\n"+
+//             offset(3)+"attribute: \""+attr->_name+"\",\n"+
+//             offset(3)+"attValue: 0,\n"+
+//             offset(3)+"attStep: 1,\n";
+//         for (size_t c = 0; c < _k; ++c)
+//         {
+//             returnString += offset(3)+"c"+std::to_string(c)+": "+std::to_string(clusters[c][v])+",\n";
+//         }
+//         returnString += offset(2)+"},\n"; 
+//     }
+//     return returnString+offset(1)+"]\n";
+// }
+
+/**
+ * Returns the JSON string of the Application
+ */
+std::string KMeans::generateApplicationOutput()
+{
+    std::cout << "Compiling LMFAO: " << std::endl;
+    std::cout << exec("cd runtime; make -j") << std::endl;
+    std::cout << "Running LMFAO: " << std::endl;
+
+    std::string outputData = exec("./runtime/lmfao"); 
+
+    return "{\n"+generateOutputColumns() + outputData+"}\n";
+}
+
+
+std::string KMeans::generateOutputFunction()
+{
+    // Get view for grid query -- equivalent to count query
+    const size_t& gridViewID = countQuery->_aggregates[0]->_incoming[0].first;
+    std::string gridViewName = "V"+std::to_string(gridViewID);
+    View* gridView = _compiler->getView(gridViewID);
+
+    std::string returnString = "\n"+offset(1)+"std::cout <<  \"   data: [\\n\"\n";
+        // offset(1)+"std::cout << \"\   appComputeTime: \" << endProcess << \",\\n\"\n"+
+        // offset(1)+"std::cout << \"\   coresetSize: \" << "+gridViewName+".size() << \",\\n\"\n"+
+
+    // Compute the one-hot encoding for each categorical variable 
+    for (size_t var=0; var < NUM_OF_VARIABLES; ++var)
+    {
+        if (gridView->_fVars[var])
+        {
+            const std::string& clustName = _td->getAttribute(var)->_name;
+            const std::string& attName = _td->getAttribute(clusterToVariableMap[var])->_name;
+
+            returnString += offset(2)+"<< \"      {\\n\"\n"+
+                offset(2)+"<< \"         attribute : \\\""+attName+"\\\",\\n\"\n"+
+                offset(2)+"<< \"         attValue : 0,\\n\"\n"+
+                offset(2)+"<< \"         attStep : 1,\\n\";\n";
+
+            if (_isCategoricalFeature[var])
+                returnString += 
+                    offset(2)+"for(size_t cluster = 0; cluster < k; ++cluster)\n"+
+                    offset(3)+"std::cout << \"         c\"+std::to_string(cluster)+\" : \" << means[cluster]."+clustName+"[0] << \",\\n\";\n";
+            else 
+                returnString += 
+                    offset(2)+"for(size_t cluster = 0; cluster < k; ++cluster)\n"+
+                    offset(3)+"std::cout << \"         c\"+std::to_string(cluster)+\" : \" << means[cluster]."+clustName+" << \",\\n\";\n";
+                
+            returnString += offset(2)+"std::cout\n"+
+                offset(2)+"<< \"      },\\n\"\n";
+        }
+    }
+    returnString += offset(2)+"<< \"   ],\" << std::endl;\n";
     return returnString;
 }

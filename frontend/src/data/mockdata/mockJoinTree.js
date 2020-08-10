@@ -170,7 +170,7 @@ export const mockJoinTree = {
       {
          "name": "Q3",
          "groupby": ["C"],
-         "root": "R",
+         "root": "U",
          "aggregates": ["C"],
       },
       {
@@ -182,43 +182,50 @@ export const mockJoinTree = {
       {
          "name": "Q5",
          "groupby": ["E"],
-         "root": "R",
+         "root": "S",
          "aggregates": ["E"],
       },
       {
          "name": "Q6",
          "groupby": ["F"],
-         "root": "R",
+         "root": "T",
          "aggregates": ["F"],
       },
    ],
    "groups": [{
          "name": "Group 0",
-         "views": ["V0", "V4"]
+         "views": ["V0", "V4"],
+         relation : "R"
       },
       {
          "name": "Group 1",
-         "views": ["V1", "V5"]
+         "views": ["V1", "V5"],
+         relation : "R"
       },
       {
          "name": "Group 2",
-         "views": ["V12"]
+         "views": ["V12"],
+         relation : "R"
       },
       {
          "name": "Group 3",
-         "views": ["V2", "V6", "V13", "V14"]
+         "views": ["V2", "V6", "V13", "V14"],
+         relation : "R"
       },
       {
          "name": "Group 4",
-         "views": ["V3", "V7", "V8", "V9", "V10"]
+         "views": ["V3", "V7", "V8", "V9", "V10"],
+         relation : "R"
       },
       {
          "name": "Group 5",
-         "views": ["V15"]
+         "views": ["V15"],
+         relation : "R"
       },
       {
          "name": "Group 6",
-         "views": ["V11"]
+         "views": ["V11"],
+         relation : "R"
       },
    ],
    "groupEdges": [{

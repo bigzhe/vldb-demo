@@ -11,7 +11,7 @@
         <div style="border: 1px solid gray; padding: 5px; height: ${boxHeight}px; overflow-y: scroll;">
           <div v-if="selectedGroup.id">
             <!-- <h5>{{selectedGroup.group}}</h5> -->
-            <h5> {{selectedGroup.id}} is computed over Relation {{ selectedGroup.base }} </h5> 
+            <h5> {{selectedGroup.id}} is computed over {{selectedGroup.base}} </h5> 
             <hr style="margin-top: 5px; margin-bottom: 5px;" />
             <Tree :data="intermediateViews"></Tree>
           </div>

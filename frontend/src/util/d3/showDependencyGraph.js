@@ -63,7 +63,7 @@ export default function showDependencyGraph(originGraph, id, clickLinkCallBack, 
     .force("link", d3.forceLink().id(function (d) {
       return d.id;
     }))
-    .force("charge", d3.forceManyBody().strength(-10000))
+    .force("charge", d3.forceManyBody().strength(-4000))
     .force("center", d3.forceCenter(width / 2, height / 2));
 
   prepareLinks()

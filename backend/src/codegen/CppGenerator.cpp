@@ -21,6 +21,8 @@
 
 const static bool USE_LEAPFROG_JOIN = true;
 
+const bool BENCH = false;
+
 using namespace multifaq::params;
 using namespace multifaq::dir;
 using namespace multifaq::cppgen;
@@ -262,7 +264,7 @@ void CppGenerator::genMainFunction(bool parallelize)
     ofs << genTestFunction() << genDumpFunction() << "}\n\n";
  
     ofs << "int main(int argc, char *argv[])\n{\n"+
-        offset(1)+"std::cout << \"run lmfao\" << std::endl;\n"+
+        // offset(1)+"std::cout << \"run lmfao\" << std::endl;\n"+
         offset(1)+"lmfao::run();\n"+
         "#ifdef TESTING\n"+offset(1)+"lmfao::ouputViewsForTesting();\n#endif\n"+
         "#ifdef DUMP_OUTPUT\n"+offset(1)+"lmfao::dumpOutputViews();\n#endif\n"+
@@ -6653,16 +6655,20 @@ std::string CppGenerator::genRunFunction(bool parallelize)
         offset(1)+"{\n";
     
     returnString += offset(2)+"int64_t startLoading = duration_cast<milliseconds>("+
-        "system_clock::now().time_since_epoch()).count();\n\n"+
-        offset(2)+"loadRelations();\n\n"+
-        offset(2)+"int64_t loadTime = duration_cast<milliseconds>("+
-        "system_clock::now().time_since_epoch()).count()-startLoading;\n"+
-        offset(2)+"std::cout << \"Data loading: \"+"+
-        "std::to_string(loadTime)+\"ms.\\n\";\n"+
-        offset(2)+"std::ofstream ofs(\"times.txt\",std::ofstream::out | "+
-        "std::ofstream::app);\n"+
-        offset(2)+"ofs << loadTime;\n"+
-        offset(2)+"ofs.close();\n\n";
+            "system_clock::now().time_since_epoch()).count();\n\n"+
+            offset(2)+"loadRelations();\n\n"+
+            offset(2)+"int64_t loadTime = duration_cast<milliseconds>("+
+            "system_clock::now().time_since_epoch()).count()-startLoading;\n"+
+            offset(2)+"std::ofstream ofs(\"times.txt\",std::ofstream::out | "+
+            "std::ofstream::app);\n"+
+            offset(2)+"ofs << loadTime;\n"+
+            offset(2)+"ofs.close();\n\n";
+
+    if (BENCH)
+    {
+        returnString += offset(2)+"std::cout << \"Data loading: \"+"+
+            "std::to_string(loadTime)+\"ms.\\n\";\n";
+    }
     
     returnString += offset(2)+"int64_t startSorting = duration_cast<milliseconds>("+
         "system_clock::now().time_since_epoch()).count();\n\n";
@@ -6693,13 +6699,18 @@ std::string CppGenerator::genRunFunction(bool parallelize)
     
     returnString += "\n"+offset(2)+"int64_t sortingTime = duration_cast<milliseconds>("+
         "system_clock::now().time_since_epoch()).count()-startSorting;\n"+
-        offset(2)+"std::cout << \"Data sorting: \" + "+
-        "std::to_string(sortingTime)+\"ms.\\n\";\n\n"+
         offset(2)+"ofs.open(\"times.txt\",std::ofstream::out | "+
         "std::ofstream::app);\n"+
         offset(2)+"ofs << \"\\t\" << sortingTime;\n"+
         offset(2)+"ofs.close();\n\n";
 
+    
+    if (BENCH)
+    {
+        returnString += offset(2)+"std::cout << \"Data sorting: \" + "+
+            "std::to_string(sortingTime)+\"ms.\\n\";\n\n";
+    }
+    
     returnString += offset(2)+"int64_t startProcess = duration_cast<milliseconds>("+
         "system_clock::now().time_since_epoch()).count();\n\n";
 
@@ -6740,19 +6751,25 @@ std::string CppGenerator::genRunFunction(bool parallelize)
     
     returnString += "\n"+offset(2)+"int64_t processTime = duration_cast<milliseconds>("+
         "system_clock::now().time_since_epoch()).count()-startProcess;\n"+
-        offset(2)+"std::cout << \"Data process: \"+"+
-        "std::to_string(processTime)+\"ms.\\n\";\n"+
         offset(2)+"ofs.open(\"times.txt\",std::ofstream::out | std::ofstream::app);\n"+
         offset(2)+"ofs << \"\\t\" << processTime;\n";
+
+    returnString += offset(2)+"std::cout << \"   aggComputeTime: \"+"+
+        "std::to_string(processTime)+\",\\n\";\n";
     
-    // if (BENCH_INDIVIDUAL)    
-    returnString += offset(2)+"std::cout << \"Size of each computed View: \" << std::endl;\n";
-    for (size_t view = 0; view < _qc->numberOfViews(); ++view)
-    {
-        returnString += offset(2)+"std::cout << \""+viewName[view]+": \" << "+
-            viewName[view]+".size() << std::endl;\n";
+    if (BENCH)
+    {   
+        returnString += offset(2)+"std::cout << \"Data process: \"+"+
+            "std::to_string(processTime)+\"ms.\\n\";\n";
+
+        returnString += offset(2)+"std::cout << \"Size of each computed View: \" << std::endl;\n";
+        for (size_t view = 0; view < _qc->numberOfViews(); ++view)
+        {
+            returnString += offset(2)+"std::cout << \""+viewName[view]+": \" << "+
+                viewName[view]+".size() << std::endl;\n";
+        }
     }
-    
+
     if (_hasApplicationHandler)
     {
         returnString += offset(2)+"ofs.close();\n\n"+

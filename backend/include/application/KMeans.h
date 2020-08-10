@@ -36,7 +36,9 @@ public:
     void run();
     
     void generateCode();
-        
+
+    std::string generateApplicationOutput(); 
+    
 private:
     
     //! Physical path to the schema and table files.
@@ -75,6 +77,12 @@ private:
     // The two bitsets are defined in ApplicationHandler
     // var_bitset _isFeature;
     // var_bitset _isCategoricalFeature
+
+
+    // std::string generateOutputData(std::vector<std::vector<double>> &clusters); 
+    std::string generateOutputColumns();
+
+    std::string generateOutputFunction();
 };
 
 #endif /* INCLUDE_APP_KMEANS_H_ */

@@ -27,6 +27,7 @@ export default new Vuex.Store({
     matrix: [],
     paramMatrix: [],
     joinTreeD3: {},
+    applicationOutput: {}
   },
   mutations: {
     SET_PROCESSING(state, processing) {
@@ -81,6 +82,26 @@ export default new Vuex.Store({
         method: 'get',
         url: `http://localhost:8081/codegen/`
       }).then(function (response) {
+        onSuccess()
+      }).catch(err => {
+        console.log(err);
+      });
+    },
+    executeCode({
+      state,
+      commit
+    }, {
+      onSuccess
+    }) {
+
+      // await axios.get
+      // returns a Promise
+      return axios({
+        method: 'get',
+        url: `http://localhost:8081/runapp/`
+      }).then(function (response) {
+        const appOutput = JSON5.parse(response.data)
+        state.applicationOutput = appOutput //generateJoinTreeD3(appOutput)
         onSuccess()
       }).catch(err => {
         console.log(err);

@@ -29,7 +29,8 @@ const generateJoinTreeD3 = mockJoinTree => {
     groupNodes: mockJoinTree.groups.map(group => {
       return {
         id: group.name,
-        views: group.views
+        views: group.views,
+        base: group.base
       }
     }),
     groupEdges: mockJoinTree.groupEdges.map(groupEdge => {
@@ -44,7 +45,7 @@ const generateJoinTreeD3 = mockJoinTree => {
       return {
         name: view.name,
         title: `View ${view.name}`,
-        expand: true,
+        expand: false,
         children: [{
             title: `Group By Variables`,
             expand: false,

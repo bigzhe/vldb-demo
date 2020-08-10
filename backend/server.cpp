@@ -63,23 +63,25 @@ static void regenViews_handler(struct mg_connection *c, int ev, void *p) {
     }
     else if (substr.compare("regen") == 0)
     {
-      std::cout << "New root assignments: ";
+      // std::cout << "New root assignments: ";
       std::vector<size_t> rootAssignment;
-
       while(stream.good()) {
         std::string substr;
         getline(stream, substr, ','); //get first string delimited by comma
         rootAssignment.push_back(std::stoi(substr));
-
-        std::cout << substr  << ", ";
+        // std::cout << substr  << ", ";
       }
 
-      std::cout << std::endl;
+      // std::cout << std::endl;
       returnMsg = app.regenerateViews(rootAssignment);
     }
     else if (substr.compare("codegen") == 0)
     {
         app.generateCode();
+    }
+    else if (substr.compare("runapp") == 0)
+    {
+        returnMsg = app.runApplication();
     }
     else 
     {
@@ -99,7 +101,9 @@ static void regenViews_handler(struct mg_connection *c, int ev, void *p) {
 int main(void)
 {
   // TODO: REMOVE and CLEANUP app->launch
-  app.launch("dataset", "model");
+  // app.launch("favorita", "kmeans");
+  // app.generateCode();
+  // exit(1);
 
   struct mg_mgr mgr;
   struct mg_connection *nc;

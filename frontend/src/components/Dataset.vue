@@ -111,6 +111,10 @@ export default class Dataset extends Vue {
     // this.$store.commit("SET_QUERY", this.Q);
     // this.$store.commit("SET_QUERY_TEXT", this.query_text);
 
+    console.log(
+      `Sending request http://localhost:8081/init/${this.selected_dataset_name.toLowerCase()},${this.selected_model}`
+    );
+
     this.$store.dispatch("init", {
       dataset: this.selected_dataset_name,
       model: this.selected_model,
