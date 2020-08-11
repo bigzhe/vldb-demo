@@ -1342,7 +1342,7 @@ std::string KMeans::generateOutputColumns()
         offset(3)+"title: \"Attribute\",\n"+
         offset(3)+"key: \"attrtibute\",\n"+
         offset(3)+"slot: \"name\",\n"+
-        offset(3)+"width: 125,\n"+
+        offset(3)+"width: 140,\n"+
         offset(3)+"fixed: \"left\",\n"+  
         offset(2)+"},\n"+
         offset(2)+"{\n"+

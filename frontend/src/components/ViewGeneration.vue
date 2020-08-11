@@ -27,7 +27,7 @@
       </Col>
       <Col span="12">
         <h4>Intermediate Views</h4>
-        <div style="border: 1px solid gray; padding: 5px; height: ${boxHeight}px; overflow-y: scroll;">
+        <div :style="`border: 1px solid gray; padding: 5px; height: ${boxHeight}px; overflow-y: scroll;`">
           <div v-if="selectedEdge.source">
             <h5>{{selectedEdge.source}} to {{selectedEdge.target}}</h5>
             <hr style="margin-top: 5px; margin-bottom: 5px;" />
@@ -40,12 +40,12 @@
     <br />
     <Row style="margin-bottom: 10px;"  >
       <Col span="12" justify="end">
-        <Row type="flex" justify="end" style="margin-right: 40px;">
+        <Row type="flex" justify="end" style="margin-right: 10px;">
         <Button @click="regenerateViews" type="primary">Regenerate Views</Button>
         </Row>
       </Col>
       <Col span="12">
-        <Row type="flex" justify="end" style="margin-right: 40px;">
+        <Row type="flex" justify="end" style="margin-right: 10px;">
         <Button @click="groupViews" type="primary">Group Views</Button>
         </Row>
       </Col>
@@ -77,7 +77,7 @@ export default class Dataset extends Vue {
   selectedEdge: { source: string; target: string; views: string[] } = dumbEdge;
   joinTreeD3 = {};
   contextData: any = {};
-  boxHeight:number = (window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight) - 500;
+  boxHeight:number = (window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight) - 700;
 
   mounted() {
     this.joinTreeD3 = this.$store.state.joinTreeD3

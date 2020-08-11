@@ -20,14 +20,15 @@
       </Col>
     </Row>
     <div style="border: 1px solid gray; padding: 5px; margin-top: 20px">
-      <div v-if="showCode">
+      <div v-if="selectedFile">
         <!-- code here -->
         <pre class="language-cpp" :data-line="dataLines" :tag-line="tagLines">
         <code class="language-cpp">
         {{fileContent}}
         </code>
-      </pre>
+        </pre>
       </div>
+      <div v-else>Select a file to inspect the code</div>
     </div>
     <Row style="margin-top: 20px;" type="flex" justify="end" :gutter="0">
         <Button @click="executeCode" type="primary">Execute Code</Button>
@@ -49,7 +50,7 @@ export default class Dataset extends Vue {
   fileContent: string = "";
   fileHtml: string = "";
   files: string[] = [];
-  showCode: boolean = true;
+  showCode: boolean = false;
   tagLines: string = "";
   dataLines: string = "";
   tags = ["ALL", "JOIN", "AGGREGATE", "RUNNING SUM", "OUTPUT"];

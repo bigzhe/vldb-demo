@@ -8,7 +8,7 @@
     <Row :gutter="20">
       <Col span="24">
         <h4>View Group</h4>
-        <div style="border: 1px solid gray; padding: 5px; height: ${boxHeight}px; overflow-y: scroll;">
+        <div :style="`border: 1px solid gray; padding: 5px; height: ${boxHeight}px; overflow-y: scroll;`">
           <div v-if="selectedGroup.id">
             <!-- <h5>{{selectedGroup.group}}</h5> -->
             <h5> {{selectedGroup.id}} is computed over {{selectedGroup.base}} </h5> 
@@ -57,7 +57,7 @@ export default class Dataset extends Vue {
   selectedEdge: { source: string; target: string; views: string[] } = dumbEdge;
   joinTreeD3 = {};
   contextData: any = {};
-  boxHeight:number = (window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight) - 500;
+  boxHeight:number = (window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight) - 700;
 
   mounted() {
     this.joinTreeD3 = this.$store.state.joinTreeD3
