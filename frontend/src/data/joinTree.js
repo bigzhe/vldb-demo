@@ -15,7 +15,8 @@ const generateJoinTreeD3 = mockJoinTree => {
     ...mockJoinTree,
     nodes: mockJoinTree.relations.map(relation => {
       return {
-        id: relation.name
+        id: relation.name,
+        output: relation.output
       }
     }),
     links: mockJoinTree.edges.filter(edge => edge.origin !== edge.dest).map(edge => {
@@ -47,22 +48,31 @@ const generateJoinTreeD3 = mockJoinTree => {
         title: `View ${view.name}`,
         expand: false,
         children: [{
-            title: `Group By Variables`,
+            title: `Group By: `+view.groupby.join(", "),
             expand: false,
-            children: view.groupby.map(v => {
-              return {
-                title: v
-              }
-            })
+            // children: view.groupby.map(v => {
+            //   return {
+            //     title: v
+            //   }
+            // })
           },
           {
-            title: `Aggregates`,
+            title: `Aggregates: `+view.aggregates.join(", "),
             expand: false,
-            children: view.aggregates.map(agg => {
-              return {
-                title: `SUM(${agg})`
-              }
-            })
+            // children: view.aggregates.map(agg => {
+            //   return {
+            //     title: agg
+            //   }
+            // })
+          },
+          {
+            title: `Join: `+view.join.join(" \u22C8 "),
+            expand: false,
+            // children: query.aggregates.map(agg => {
+            //   return {
+            //     title: agg
+            //   }
+            // })
           }
         ]
       }
@@ -74,22 +84,22 @@ const generateJoinTreeD3 = mockJoinTree => {
         expand: false,
         contextmenu: true,
         children: [{
-            title: `Group By Variables`,
+            title: `Group By: `+query.groupby.join(", "),
             expand: false,
-            children: query.groupby.map(v => {
-              return {
-                title: v
-              }
-            })
+            // children: query.groupby.map(v => {
+            //   return {
+            //     title: v
+            //   }
+            // })
           },
           {
-            title: `Aggregates`,
+            title: `Aggregates: `+query.aggregates.join(", "),
             expand: false,
-            children: query.aggregates.map(agg => {
-              return {
-                title: agg
-              }
-            })
+            // children: query.aggregates.map(agg => {
+            //   return {
+            //     title: agg
+            //   }
+            // })
           }
         ]
       }

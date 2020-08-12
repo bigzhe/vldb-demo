@@ -4,7 +4,7 @@ const relationSchema = {
   datasets: [
     {
       name : "Retailer",
-      relations : ["Inventory", "Location", "Item", "Census", "Weather"]
+      relations : ["Inventory", "Item", "Location",  "Census", "Weather"]
     },
     {
       name : "Favorita",
@@ -19,81 +19,97 @@ const relationSchema = {
     {
       name : "Inventory",
       attributes : ["locn","dateid","ksn","inventoryunits"],
-      size : 1000 
+      joinAttributes : ["locn","dateid","ksn"],
+      size : "84,055,817 tuples,  1.5GB"
     },
     {
       name : "Location",
       attributes : ["locn","zip","rgn_cd","clim_zn_nbr","tot_area_sq_ft","sell_area_sq_ft","avghhi","supertargetdistance","supertargetdrivetime","targetdistance","targetdrivetime","walmartdistance","walmartdrivetime","walmartsupercenterdistance","walmartsupercenterdrivetime"],
-      size : 1000 
+      joinAttributes : ["locn","zip"],
+      size : "1317 tuples,   131KB"
     },
     {
       name : "Census",
       attributes : ["zip","population","white","asian","pacific","black","medianage","occupiedhouseunits","houseunits","families","households","husbwife","males","females","householdschildren","hispanic"],
-      size : 1000 
+      joinAttributes : ["zip"],
+      size : "1,302 tuples,  104 KB"
     },
     {
       name : "Item",
       attributes : ["ksn","subcategory","category","categoryCluster","prize"],
-      size : 1000 
+      joinAttributes : ["ksn"],
+      size : "5,618 tuples,  128KB" 
     },    {
       name : "Weather",
       attributes : ["locn","dateid","rain","snow","maxtemp","mintemp","meanwind","thunder"],
-      size : 1000 
+      joinAttributes : ["locn", "dateid"],
+      size : "1,159,457 tuples,  32MB" 
     },
     {
       name : "Store",
-      attributes : ["a", "b", "c"],
-      size : 1000 
+      attributes : ["a", "b", "c"],      
+      joinAttributes : [],
+      size : ["1000"]
     },
     {
       name : "Sales",
       attributes : ["date","store","item","unit_sales","onpromotion"],
-      size : 1000 
+      joinAttributes : [],
+      size : ["1000"]
     },
     {
       name : "Stores",
       attributes : ["store","city","state","store_type","cluster"],
-      size : 1000 
+      joinAttributes : [],
+      size : ["1000"]
     },
     {
       name : "Items",
       attributes : ["item","family","itemclass","perishable"],
-      size : 1000 
+      joinAttributes : [],
+      size : ["1000"]
     },
     {
       name : "Transactions",
       attributes : ["date","store","transactions"],
-      size : 1000 
+      joinAttributes : [],
+      size : ["1000"]
     },
     {
       name : "Oil",
       attributes : ["date","oilprice"],
-      size : 1000 
+      joinAttributes : [],
+      size : ["1000"]
     },
     {
       name : "Holiday",
       attributes : ["date","holiday_type","locale","locale_id","transferred"],
-      size : 1000 
+      joinAttributes : [],
+      size : ["1000"]
     },
     {
       name : "R",
       attributes : ["A","B","C"],
-      size : 1000 
+      joinAttributes : [],
+      size :  ["1000"]
     },
     {
       name : "S",
       attributes : ["B","D"],
-      size : 1000 
+      joinAttributes : [],
+      size :  ["1000"]
     },
     {
       name : "T",
       attributes : ["A","E"],
-      size : 1000 
+      joinAttributes : [],
+      size :  ["1000"]
     },
     {
       name : "U",
       attributes : ["E","F"],
-      size : 1000 
+      joinAttributes : [],
+      size :  ["1000"]
     }
   ]
 }
@@ -112,16 +128,25 @@ const schemaTree = {
       contextmenu: false,
       children: [
         {
-          title: `Attributes`,
+          title: `Attributes: `+(rel.attributes.join(", ")),
           expand: false,
-          children: rel.attributes.map(v => {
-            return {title: v}
-          })
+          // children: rel.attributes.map(v => {
+          //   return {title: v}
+          // })
         },
         {
-          title: `Size`,
+          title: `Join Attributes: `+(rel.joinAttributes.join(", ")),
           expand: false,
-          children: [ {title: rel.size} ]
+          // children: rel.attributes.map(v => {
+          //   return {title: v}
+          // })
+        },
+        {
+          title: `Size: `+rel.size,
+          expand: false,
+          // children: rel.size.map(v => {
+          //   return {title: v}
+          // })
         }
       ]
     }

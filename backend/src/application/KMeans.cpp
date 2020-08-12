@@ -526,17 +526,17 @@ std::string KMeans::genKMeansFunction()
         "std::ofstream::app);\n"+
         offset(2)+"ofs << \"\\t\" << endInit << \"\\t\" << endProcess << \"\\t\" << iteration;\n"+
         offset(2)+"ofs.close();\n\n";
-        // offset(2)+"std::cout << \"Kmeans Init: \"+"+
-        // "std::to_string(endInit)+\"ms.\\n\";\n"+
-        // offset(2)+"std::cout << \"Run kMeans: \"+"+
-        // "std::to_string(endProcess)+\"ms.\\n\";\n\n";// +
-        // offset(2)+"std::cout << \"Number of Iterations: \"+"+
-        // "std::to_string(iteration)+\"\\n\";\n\n";
+    // offset(2)+"std::cout << \"Kmeans Init: \"+"+
+    // "std::to_string(endInit)+\"ms.\\n\";\n"+
+    // offset(2)+"std::cout << \"Run kMeans: \"+"+
+    // "std::to_string(endProcess)+\"ms.\\n\";\n\n";// +
+    // offset(2)+"std::cout << \"Number of Iterations: \"+"+
+    // "std::to_string(iteration)+\"\\n\";\n\n";
 
     if (INCLUDE_EVALUATION)
         returnString += offset(2)+"evaluateModel(means);\n";
 
-    returnString += generateOutputFunction(); 
+    returnString += generateOutputFunction();
 
     return returnString+offset(1)+"}\n\n";
 }
@@ -833,7 +833,7 @@ std::string KMeans::genComputeGridPointsFunction()
 
     if (INCLUDE_EVALUATION)
         returnString += genModelEvaluationFunction();
-    
+
     returnString += genKMeansFunction();
 
     if (!continuousQueries.empty())
@@ -1191,7 +1191,6 @@ std::string KMeans::genComputeGridPointsFunction()
                 const std::string origView = "V"+std::to_string(origViewID);
                 const std::string& origAttName = _td->getAttribute(origVar)->_name;
 
-
                 returnString += "\n"+offset(2)+
                     "// For categorical variable "+origAttName+"\n";
 
@@ -1232,8 +1231,10 @@ std::string KMeans::genComputeGridPointsFunction()
         // "std::to_string(endProcess)+\"ms.\\n\";\n"+
         // offset(2)+"std::cout << \"Size of Grid: \" << "+
         // countViewName+".size() << \" points.\\n\";\n"+
-        offset(2)+"std::cout << \"   coresetSize: \" << "+
-        countViewName+".size() << \",\\n\";\n";
+        offset(2)+"std::cout << \"   coresetSize: \" << "+countViewName+".size() << \",\\n\";\n"+
+        offset(2)+"std::cout << \"   querySize: \" << size_of_query_result << \",\\n\";\n"+
+        offset(2)+"std::cout << \"   relativeCoresetSize: \" << (((double)"+
+        countViewName+".size()) / size_of_query_result) * 100 << \",\\n\";\n";
 
     return returnString+offset(1)+"}\n\n";
 }
@@ -1336,35 +1337,35 @@ std::string KMeans::genClusterInitialization(const std::string& gridName)
 
 std::string KMeans::generateOutputColumns()
 {
-    std::string returnString = 
+    std::string returnString =
         offset(1)+"columns : [\n"+
         offset(2)+"{\n"+
         offset(3)+"title: \"Attribute\",\n"+
         offset(3)+"key: \"attrtibute\",\n"+
         offset(3)+"slot: \"name\",\n"+
         offset(3)+"width: 140,\n"+
-        offset(3)+"fixed: \"left\",\n"+  
+        offset(3)+"fixed: \"left\",\n"+
         offset(2)+"},\n"+
         offset(2)+"{\n"+
         offset(3)+"title: \"Data Point\",\n"+
         offset(3)+"key: \"point\",\n"+
         offset(3)+"slot: \"point\",\n"+
         offset(3)+"width: 145,\n"+
-        offset(3)+"fixed: \"left\",\n"+  
+        offset(3)+"fixed: \"left\",\n"+
         offset(3)+"align: \"center\",\n"+
         offset(3)+"className: 'demo-table-info-column'\n"+
         offset(2)+"},\n";
 
     for (size_t c = 0; c < _k; ++c)
     {
-        returnString += 
+        returnString +=
             offset(2)+"{\n"+
             offset(3)+"title: \"Cluster "+std::to_string(c+1)+"\",\n"+
             offset(3)+"key: \"c"+std::to_string(c)+"\",\n"+
             offset(3)+"className: 'normal-table-column'\n"+
-            offset(2)+"},\n"; 
+            offset(2)+"},\n";
     }
-    return returnString+offset(1)+"],\n"; 
+    return returnString+offset(1)+"],\n";
 }
 
 // std::string KMeans::generateOutputData(std::vector<std::vector<double>> &clusters)
@@ -1395,7 +1396,7 @@ std::string KMeans::generateApplicationOutput()
     std::cout << exec("cd runtime; make -j") << std::endl;
     std::cout << "Running LMFAO: " << std::endl;
 
-    std::string outputData = exec("./runtime/lmfao"); 
+    std::string outputData = exec("./runtime/lmfao");
 
     return "{\n"+generateOutputColumns() + outputData+"}\n";
 }
@@ -1409,10 +1410,10 @@ std::string KMeans::generateOutputFunction()
     View* gridView = _compiler->getView(gridViewID);
 
     std::string returnString = "\n"+offset(1)+"std::cout <<  \"   data: [\\n\"\n";
-        // offset(1)+"std::cout << \"\   appComputeTime: \" << endProcess << \",\\n\"\n"+
-        // offset(1)+"std::cout << \"\   coresetSize: \" << "+gridViewName+".size() << \",\\n\"\n"+
+    // offset(1)+"std::cout << \"\   appComputeTime: \" << endProcess << \",\\n\"\n"+
+    // offset(1)+"std::cout << \"\   coresetSize: \" << "+gridViewName+".size() << \",\\n\"\n"+
 
-    // Compute the one-hot encoding for each categorical variable 
+// Compute the one-hot encoding for each categorical variable 
     for (size_t var=0; var < NUM_OF_VARIABLES; ++var)
     {
         if (gridView->_fVars[var])
@@ -1426,14 +1427,14 @@ std::string KMeans::generateOutputFunction()
                 offset(2)+"<< \"         attStep : 1,\\n\";\n";
 
             if (_isCategoricalFeature[var])
-                returnString += 
-                    offset(2)+"for(size_t cluster = 0; cluster < k; ++cluster)\n"+
-                    offset(3)+"std::cout << \"         c\"+std::to_string(cluster)+\" : \" << means[cluster]."+clustName+"[0] << \",\\n\";\n";
-            else 
-                returnString += 
-                    offset(2)+"for(size_t cluster = 0; cluster < k; ++cluster)\n"+
-                    offset(3)+"std::cout << \"         c\"+std::to_string(cluster)+\" : \" << means[cluster]."+clustName+" << \",\\n\";\n";
-                
+                returnString +=
+                offset(2)+"for(size_t cluster = 0; cluster < k; ++cluster)\n"+
+                offset(3)+"std::cout << \"         c\"+std::to_string(cluster)+\" : \" << means[cluster]."+clustName+"[0] << \",\\n\";\n";
+            else
+                returnString +=
+                offset(2)+"for(size_t cluster = 0; cluster < k; ++cluster)\n"+
+                offset(3)+"std::cout << \"         c\"+std::to_string(cluster)+\" : \" << means[cluster]."+clustName+" << \",\\n\";\n";
+
             returnString += offset(2)+"std::cout\n"+
                 offset(2)+"<< \"      },\\n\"\n";
         }

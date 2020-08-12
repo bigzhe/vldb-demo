@@ -10,6 +10,8 @@
 #ifndef INCLUDE_QUERYCOMPILER_H_
 #define INCLUDE_QUERYCOMPILER_H_
 
+#include <boost/dynamic_bitset.hpp>
+
 #include <bitset>
 #include <map>
 #include <unordered_map>
@@ -293,6 +295,11 @@ private:
     void computeViewGroups(); 
 
     void test(); // TODO: this should be removed - but helpful for testing
+
+    std::string genProductString(
+    const TDNode& node, const boost::dynamic_bitset<> &contributingViews, const prod_bitset& product);
+
+    std::string getFunctionString(Function* f, std::string& fvars);
 };
 
 #endif /* INCLUDE_QUERYCOMPILER_H_ */

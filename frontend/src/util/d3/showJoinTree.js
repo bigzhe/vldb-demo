@@ -63,7 +63,7 @@ export default function showJoinTree(originGraph, id, clickLinkCallBack, clickNo
     .force("link", d3.forceLink().id(function (d) {
       return d.id;
     }))
-    .force("charge", d3.forceManyBody().strength(-10000))
+    .force("charge", d3.forceManyBody().strength(-5000))
     .force("center", d3.forceCenter(width / 2, height / 2));
 
   prepareLinks()

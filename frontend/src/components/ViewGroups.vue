@@ -57,7 +57,7 @@ export default class Dataset extends Vue {
   selectedEdge: { source: string; target: string; views: string[] } = dumbEdge;
   joinTreeD3 = {};
   contextData: any = {};
-  boxHeight:number = (window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight) - 700;
+  boxHeight:number = (window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight) - 630;
 
   mounted() {
     this.joinTreeD3 = this.$store.state.joinTreeD3

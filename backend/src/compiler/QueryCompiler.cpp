@@ -35,19 +35,19 @@ QueryCompiler::~QueryCompiler()
 
 void QueryCompiler::compile()
 {
-    DINFO("Compiling the queries into views - number of queries: " + 
-          to_string(_queryList.size())+"\n");
+    DINFO("Compiling the queries into views - number of queries: " +
+        to_string(_queryList.size())+"\n");
 
-#ifdef PRINT_OUT_COMPILER_EXTENDED
+    #ifdef PRINT_OUT_COMPILER_EXTENDED
     printf("Print list of queries to be computed: \n");
     int qID = 0;
     for (Query* q : _queryList)
     {
         printf("%d (%s): ", qID++, _td->getRelation(q->_rootID)->_name.c_str());
         for (size_t i = 0; i < NUM_OF_VARIABLES; i++)
-            if(q->_fVars.test(i)) printf(" %s ",_td->getAttribute(i)->_name.c_str());
+            if (q->_fVars.test(i)) printf(" %s ", _td->getAttribute(i)->_name.c_str());
         printf(" || ");
-        
+
         for (size_t aggNum = 0; aggNum < q->_aggregates.size(); ++aggNum)
         {
             Aggregate* agg = q->_aggregates[aggNum];
@@ -65,14 +65,14 @@ void QueryCompiler::compile()
                                 printf(" %s ", _td->getAttribute(i)->_name.c_str());
                         printf(" )");
                     }
-                    ++aggIdx;
+                ++aggIdx;
                 printf(" - ");
             }
         }
         printf("\n");
     }
-#endif
-    
+    #endif
+
     for (Query* q : _queryList)
     {
         for (size_t agg = 0; agg < q->_aggregates.size(); ++agg)
@@ -81,8 +81,8 @@ void QueryCompiler::compile()
 
             aggregate->_incoming.push_back(
                 compileViews(_td->getRelation(q->_rootID), q->_rootID,
-                             aggregate->_agg, q->_fVars)
-                );
+                    aggregate->_agg, q->_fVars)
+            );
         }
     }
 
@@ -90,13 +90,13 @@ void QueryCompiler::compile()
 
     computeViewGroups();
 
-#ifdef PRINT_OUT_COMPILER  /* Printout */
+    #ifdef PRINT_OUT_COMPILER  /* Printout */
     printf("Print list of views to be computed: \n");
     int viewID = 0;
     for (View* v : _viewList)
     {
         printf("%d (%s, %s): ", viewID++, _td->getRelation(v->_origin)->_name.c_str(),
-               _td->getRelation(v->_destination)->_name.c_str());
+            _td->getRelation(v->_destination)->_name.c_str());
         for (size_t i = 0; i < NUM_OF_VARIABLES; i++)
             if (v->_fVars.test(i)) printf(" %s ", _td->getAttribute(i)->_name.c_str());
         printf(" || ");
@@ -127,9 +127,9 @@ void QueryCompiler::compile()
         //     aggString.pop_back();
         //     aggString += "   ||   ";
         // }
-        printf("%s -- %lu \n", aggString.c_str(),v->_aggregates.size());
+        printf("%s -- %lu \n", aggString.c_str(), v->_aggregates.size());
     }
-#endif /* Printout */
+    #endif /* Printout */
 
     // exit(0);
 }
@@ -175,12 +175,12 @@ Function* QueryCompiler::getFunction(size_t f_id)
 }
 
 void QueryCompiler::clear()
-{   
-    for (View* view :  _viewList)
+{
+    for (View* view : _viewList)
         delete view;
 
     delete[] viewToGroupMapping;
-    
+
     _cache.clear();
     _viewCache.clear();
 
@@ -189,33 +189,33 @@ void QueryCompiler::clear()
 
     for (Query* q : _queryList)
     {
-        for (const auto  agg : q->_aggregates)
+        for (const auto agg : q->_aggregates)
             agg->_incoming.clear();
     }
 }
 
-pair<size_t,size_t> QueryCompiler::compileViews(
+pair<size_t, size_t> QueryCompiler::compileViews(
     TDNode* node, size_t targetID, vector<prod_bitset> aggregate, var_bitset freeVars)
 {
     bool print = 0; // (node->_id == 2);
-        
+
     /* Check if the required view has already been declared - if so reuse this one */
     cache_tuple t = make_tuple(node->_id, targetID, aggregate, freeVars);
     auto it = _cache.find(t);
     if (it != _cache.end())
     {
-        if (print) 
-            DINFO("We effectively reused an exisitng view. \n");      
+        if (print)
+            DINFO("We effectively reused an exisitng view. \n");
         // _viewList[it->second]->_usageCount += 1;
         return it->second;
     }
 
-    
+
     if (print)
     {
         DINFO("\nBeginning compileViews at node " + to_string(node->_id) + " target "+
-              to_string(targetID) + " freeVars: " + freeVars.to_string() +
-              " number of products: " + to_string(aggregate.size()) +"\n");
+            to_string(targetID) + " freeVars: " + freeVars.to_string() +
+            " number of products: " + to_string(aggregate.size()) +"\n");
 
         std::string aggString = " ";
         size_t aggIdx = 0;
@@ -238,7 +238,7 @@ pair<size_t,size_t> QueryCompiler::compileViews(
         aggString.pop_back();
         printf("%s\n", aggString.c_str());
     }
-    
+
     vector<prod_bitset> pushDownMask(node->_numOfNeighbors);
     prod_bitset localMask, forcedLocalFunctions, remainderMask, presentFunctions;
 
@@ -252,13 +252,13 @@ pair<size_t,size_t> QueryCompiler::compileViews(
         {
             // DINFO("Now considering function "+to_string(i)+" at node "+
             //       node->_name+"\n");
-            
+
             const var_bitset& fVars = _functionList[i]->_fVars;
             bool pushedDown = false;
 
             /*
              * Check if that function is included in the local bag
-             * - if so, then we do not push it down 
+             * - if so, then we do not push it down
              */
             if ((node->_bag & fVars) == fVars)
             {
@@ -276,7 +276,7 @@ pair<size_t,size_t> QueryCompiler::compileViews(
                 for (size_t c = 0; c < node->_numOfNeighbors; c++)
                 {
                     // TDNode* neighbor = _td->getRelation(node->_neighbors[c]);
-                
+
                     /* neighbor is not target! */
                     if (node->_neighbors[c] != targetID) // neyighbor->_id
                     {
@@ -308,16 +308,16 @@ pair<size_t,size_t> QueryCompiler::compileViews(
 
     if (print)
         std::cout << localMask << std::endl;
-    
+
     vector<var_bitset> pushDownFreeVars(aggregate.size(), freeVars);
-    
+
     std::unordered_map<prod_bitset, agg_bitset> localAggMap;
 
     for (size_t prod = 0; prod < aggregate.size(); prod++)
     {
         // Add freeVars that do not exist in local bag to pushDownFreeVars
         prod_bitset forcedLocal = aggregate[prod] & forcedLocalFunctions;
-        
+
         for (size_t f = 0; f < NUM_OF_FUNCTIONS; ++f)
         {
             if (forcedLocal[f])
@@ -326,9 +326,9 @@ pair<size_t,size_t> QueryCompiler::compileViews(
                     _functionList[f]->_fVars & ~node->_bag;
             }
         }
-        
+
         prod_bitset localAggregate = aggregate[prod] & localMask;
-        
+
         // add this product to localAggregates
         auto it = localAggMap.find(localAggregate);
         if (it != localAggMap.end())
@@ -341,81 +341,81 @@ pair<size_t,size_t> QueryCompiler::compileViews(
         }
     }
 
-    
-    /* 
+
+    /*
      * For each product - split the functions into the ones that are pushed down
-     * and the local functions 
+     * and the local functions
      */
-    // for (size_t prod = 0; prod < aggregate.size(); prod++)
-    // {
-    //     if (!visited[prod])
-    //     {
-    //         vector<prod_bitset> localAggregate = {aggregate[prod] & localMask};
-    //         // for (size_t other = prod + 1; other < aggregate.size(); other++)
-    //         // {
-    //         //     /* check if prod and other share the same functions below */
-    //         //     if ((aggregate[prod] & remainderMask) ==
-    //         //         (aggregate[other] & remainderMask))
-    //         //     {
-    //         //         /* Check if the local free vars are matching */
-    //         //         if (pushDownFreeVars[prod] == pushDownFreeVars[other])
-    //         //         {
-    //         //             /* If they match then we can combine the local
-    //         //              * aggregates */
-    //         //             localAggregate.push_back(aggregate[other] & localMask);
-    //         //             visited.set(other);
-    //         //         }
-    //         //     }
-    //         // }            
-    //         // add this product to localAggregates
-    //         auto it = localAggMap.find(localAggregate);
-    //         if (it != localAggMap.end())
-    //         {
-    //             it->second.set(prod);
-    //         }
-    //         else
-    //         {
-    //             agg_bitset thisProd;
-    //             thisProd.set(prod);
-    //             localAggMap[localAggregate] = thisProd;
-    //         }
-    //     }
-    // }
-    
-  
+     // for (size_t prod = 0; prod < aggregate.size(); prod++)
+     // {
+     //     if (!visited[prod])
+     //     {
+     //         vector<prod_bitset> localAggregate = {aggregate[prod] & localMask};
+     //         // for (size_t other = prod + 1; other < aggregate.size(); other++)
+     //         // {
+     //         //     /* check if prod and other share the same functions below */
+     //         //     if ((aggregate[prod] & remainderMask) ==
+     //         //         (aggregate[other] & remainderMask))
+     //         //     {
+     //         //         /* Check if the local free vars are matching */
+     //         //         if (pushDownFreeVars[prod] == pushDownFreeVars[other])
+     //         //         {
+     //         //             /* If they match then we can combine the local
+     //         //              * aggregates */
+     //         //             localAggregate.push_back(aggregate[other] & localMask);
+     //         //             visited.set(other);
+     //         //         }
+     //         //     }
+     //         // }            
+     //         // add this product to localAggregates
+     //         auto it = localAggMap.find(localAggregate);
+     //         if (it != localAggMap.end())
+     //         {
+     //             it->second.set(prod);
+     //         }
+     //         else
+     //         {
+     //             agg_bitset thisProd;
+     //             thisProd.set(prod);
+     //             localAggMap[localAggregate] = thisProd;
+     //         }
+     //     }
+     // }
+
+
     if (print)
     {
         size_t localAggIndex = 0;
         for (pair<const prod_bitset, agg_bitset>& localAgg : localAggMap)
-            std::cout << localAggIndex++ << " : " << localAgg.first 
-                      << " -> " << localAgg.second << std::endl;
+            std::cout << localAggIndex++ << " : " << localAgg.first
+            << " -> " << localAgg.second << std::endl;
     }
 
 
     Aggregate* agg = new Aggregate();
 
-    /* 
+    /*
      * We now computed the local aggregates and the groups of products they
      * correspond to - now we check if we can merge several products before the
-     * recursion 
+     * recursion
      */
     size_t localAggIndex = 0;
     for (pair<const prod_bitset, agg_bitset>& localAgg : localAggMap)
     {
         if (print)
-            std::cout << localAggIndex++ << " : " << localAgg.first 
-                      << " -> " << localAgg.second << std::endl;
-        
+            std::cout << localAggIndex++ << " : " << localAgg.first
+            << " -> " << localAgg.second << std::endl;
+
         for (size_t prod = 0; prod < NUM_OF_PRODUCTS; ++prod)
         {
             if (localAgg.second[prod])
             {
                 if (print)
                     std::cout << prod << std::endl;
-                
+
                 // Push local aggregate on aggregate
                 agg->_agg.push_back(localAgg.first);
-                
+
                 size_t neigh = 0;
                 bool mergable = false;
 
@@ -428,7 +428,7 @@ pair<size_t,size_t> QueryCompiler::compileViews(
                     for (neigh = 0; neigh < node->_numOfNeighbors; ++neigh)
                     {
                         for (size_t other_prod = prod+1; other_prod < NUM_OF_PRODUCTS;
-                             ++other_prod)
+                            ++other_prod)
                         {
                             if (candidate[other_prod])
                             {
@@ -448,31 +448,31 @@ pair<size_t,size_t> QueryCompiler::compileViews(
                         }
 
                         if (mergable)
-                            break;                        
+                            break;
                     }
                 }
 
                 if (print && mergable)
                     std::cout << "mergeable: " << merges << std::endl;
-                
+
                 // For each neighbor compile the (merged) views and push on incoming
                 for (size_t n = 0; n < node->_numOfNeighbors; ++n)
                 {
                     if (node->_neighbors[n] != targetID)
                     {
                         vector<prod_bitset> childAgg =
-                            {aggregate[prod] & pushDownMask[n]};
-                        
+                        { aggregate[prod] & pushDownMask[n] };
+
                         if (mergable && n == neigh)
-                        {  
+                        {
                             for (size_t other = 0; other < NUM_OF_PRODUCTS; ++other)
                             {
                                 if (merges[other])
-                                {     
+                                {
                                     /* Add mergable products to this array */
                                     childAgg.push_back(
                                         aggregate[other] & pushDownMask[n]);
-                                    
+
                                     /* And unset for the flag in localAgg.second */
                                     localAgg.second.reset(other);
                                 }
@@ -483,31 +483,31 @@ pair<size_t,size_t> QueryCompiler::compileViews(
 
                         var_bitset neighborFreeVars =
                             ((freeVars | pushDownFreeVars[prod]) &
-                             node->_neighborSchema[n]) |
+                                node->_neighborSchema[n]) |
                             (neighbor->_bag & node->_bag);
 
                         agg->_incoming.push_back(
-                             compileViews(neighbor, node->_id, childAgg,
-                                          neighborFreeVars));             
+                            compileViews(neighbor, node->_id, childAgg,
+                                neighborFreeVars));
                     }
                 }
             }
         }
     }
 
-    /* Check here if a View with the same node, target and freeVars exists 
-    - if so then we want to push the aggregate on this array 
+    /* Check here if a View with the same node, target and freeVars exists
+    - if so then we want to push the aggregate on this array
     */
     View* view;
     view_tuple vt = make_tuple(node->_id, targetID, freeVars);
     pair<size_t, size_t> viewAggregatePair;
-    
+
     /* Check if the required view has already been declared - if so reuse this one */
     auto view_it = _viewCache.find(vt);
     if (view_it != _viewCache.end())
     {
         view = _viewList[view_it->second];
-        
+
         view->_aggregates.push_back(agg);
 
         /* Used for caching entire view and aggregate */
@@ -516,7 +516,7 @@ pair<size_t,size_t> QueryCompiler::compileViews(
     else
     {
         view = new View(node->_id, targetID);
-        
+
         view->_fVars = freeVars;
         view->_aggregates.push_back(agg);
 
@@ -529,15 +529,15 @@ pair<size_t,size_t> QueryCompiler::compileViews(
         /* Used for caching entire view and aggregate */
         viewAggregatePair =  make_pair(_viewList.size()-1, 0);
     }
-    
-    /* Adding the  view for the entire subtree to the cache */ 
+
+    /* Adding the  view for the entire subtree to the cache */
     _cache[t] = viewAggregatePair;
 
     // DINFO("End of compileViews for "+to_string(node->_id)+" to "+
     //       to_string(targetID)+"\n");
-    
-    /* Return ID of this view */  
-    return viewAggregatePair;    
+
+    /* Return ID of this view */
+    return viewAggregatePair;
 }
 
 
@@ -550,8 +550,8 @@ void QueryCompiler::computeIncomingViews()
 
         size_t numberIncomingViews =
             (view->_origin == view->_destination ? baseRelation->_numOfNeighbors :
-             baseRelation->_numOfNeighbors - 1);
-        
+                baseRelation->_numOfNeighbors - 1);
+
         std::vector<bool> incViewBitset(numberOfViews());
         for (size_t aggNo = 0; aggNo < view->_aggregates.size(); ++aggNo)
         {
@@ -565,7 +565,7 @@ void QueryCompiler::computeIncomingViews()
                 for (size_t j = 0; j < numberIncomingViews; ++j)
                 {
                     const size_t& incViewID = aggregate->_incoming[incOffset].first;
-                
+
                     // Indicate that this view contributes to some aggregate
                     incViewBitset[incViewID] = 1;
                     ++incOffset;
@@ -579,13 +579,13 @@ void QueryCompiler::computeIncomingViews()
             //         incViewBitset[viewAgg.first] = 1;
             //     }
             // }
-        }        
+        }
         // For each incoming view, check if it contains any vars from the
         // variable order and then add it to the corresponding info
         for (size_t incViewID=0; incViewID < numberOfViews(); ++incViewID)
             if (incViewBitset[incViewID])
                 view->_incomingViews.push_back(incViewID);
-    }   
+    }
 }
 
 
@@ -595,30 +595,30 @@ void QueryCompiler::computeViewGroups()
 
     std::vector<std::vector<size_t>> viewsPerNode(
         _td->numberOfRelations(), std::vector<size_t>());
-    
+
     for (size_t viewID = 0; viewID < numberOfViews(); ++viewID)
     {
         // Keep track of the views that origin from this node 
         viewsPerNode[_viewList[viewID]->_origin].push_back(viewID);
     }
-    
+
     /* Next compute the topological order of the views */
     dyn_bitset processedViews(numberOfViews());
     dyn_bitset queuedViews(numberOfViews());
-    
+
     dyn_bitset incomingViews(numberOfViews());
-    
+
     // create orderedViewList -> which is empty
     std::vector<size_t> orderedViewList;
     std::queue<size_t> nodesToProcess;
-    
+
     // Find all views that originate from leaf nodes
     for (const size_t& nodeID : _td->_leafNodes)
     {
         for (const size_t& viewID : viewsPerNode[nodeID])
         {
             std::vector<size_t>& incViews = _viewList[viewID]->_incomingViews;
-            
+
             if (incViews.size() == 0)
             {
                 queuedViews.set(viewID);
@@ -626,7 +626,7 @@ void QueryCompiler::computeViewGroups()
             }
         }
     }
-    
+
     while (!nodesToProcess.empty()) // there is a node in the set
     {
         size_t viewID = nodesToProcess.front();
@@ -645,14 +645,14 @@ void QueryCompiler::computeViewGroups()
             {
                 bool candidate = true;
                 for (const size_t& incView : _viewList[destView]->_incomingViews)
-                {    
+                {
                     if (!processedViews[incView] && !queuedViews[incView])
                     {
                         candidate = false;
                         break;
                     }
                 }
-                
+
                 if (candidate && !queuedViews[destView])
                 {
                     queuedViews.set(destView);
@@ -669,12 +669,12 @@ void QueryCompiler::computeViewGroups()
 
     for (size_t incViewID : prevView->_incomingViews)
         incomingViews.set(incViewID);
-    
-    viewGroups.push_back(
-        {orderedViewList[0],_td->getRelation(prevOrigin)}
-        );
 
-    viewToGroupMapping[orderedViewList[0]] = 0;    
+    viewGroups.push_back(
+        { orderedViewList[0], _td->getRelation(prevOrigin) }
+    );
+
+    viewToGroupMapping[orderedViewList[0]] = 0;
     size_t currentGroup = 0;
     for (size_t viewID = 1; viewID < orderedViewList.size(); ++viewID)
     {
@@ -692,27 +692,27 @@ void QueryCompiler::computeViewGroups()
             for (size_t incViewID = 0; incViewID < numberOfViews(); ++incViewID)
                 if (incomingViews[incViewID])
                     viewGroups[currentGroup]._incomingViews.push_back(incViewID);
-            
+
             incomingViews.reset();
-            
+
             // Create a new group
-            viewGroups.push_back({orderedViewList[viewID],
-                    _td->getRelation(_viewList[orderedViewList[viewID]]->_origin)});
-            
+            viewGroups.push_back({ orderedViewList[viewID],
+                _td->getRelation(_viewList[orderedViewList[viewID]]->_origin) });
+
             ++currentGroup;
             viewToGroupMapping[orderedViewList[viewID]] = currentGroup;
         }
 
         for (size_t incViewID : view->_incomingViews)
             incomingViews.set(incViewID);
-  
+
         prevOrigin = origin;
     }
 
-    /* Setting incoming views for last viewGroup */ 
+    /* Setting incoming views for last viewGroup */
     for (size_t incViewID = 0; incViewID < numberOfViews(); ++incViewID)
         if (incomingViews[incViewID])
-            viewGroups[currentGroup]._incomingViews.push_back(incViewID);            
+            viewGroups[currentGroup]._incomingViews.push_back(incViewID);
 
     /**************** PRINT OUT **********************/
     DINFO("Ordered View List: ");
@@ -732,28 +732,28 @@ void QueryCompiler::computeViewGroups()
 
 void QueryCompiler::test()
 {
-    Function* f0 = new Function({0,1}, Operation::count);
-    Function* f1 = new Function({1,3}, Operation::count);
-    Function* f2 = new Function({0,4}, Operation::sum);
-    Function* f3 = new Function({4,5}, Operation::sum);
+    Function* f0 = new Function({ 0, 1 }, Operation::count);
+    Function* f1 = new Function({ 1, 3 }, Operation::count);
+    Function* f2 = new Function({ 0, 4 }, Operation::sum);
+    Function* f3 = new Function({ 4, 5 }, Operation::sum);
 
-    Function* f4 = new Function({0,2}, Operation::count);
-    Function* f5 = new Function({1,3}, Operation::sum);
-    Function* f6 = new Function({1,3}, Operation::sum);
-    
+    Function* f4 = new Function({ 0, 2 }, Operation::count);
+    Function* f5 = new Function({ 1, 3 }, Operation::sum);
+    Function* f6 = new Function({ 1, 3 }, Operation::sum);
+
     // Function* f4 = new Function({4,5}, Operation::count);
     // Function* f5 = new Function({1,3}, Operation::sum);
     // Function* f6 = new Function({0,4}, Operation::sum);
     // Function* f7 = new Function({3,4}, Operation::sum);
     // Function* f8 = new Function({4,5}, Operation::count);
     // _functionList = {f0,f1,f2,f3,f4,f5,f6,f7,f8};
-    _functionList = {f0,f1,f2,f3,f4,f5,f6};
-    
-    vector<int> prod1 = {0,1,2,3};
-    vector<int> prod2 = {4,1,2,3};
-    vector<int> prod3 = {0,5,2,3};
-    vector<int> prod4 = {0,6,2,3};
-    
+    _functionList ={ f0, f1, f2, f3, f4, f5, f6 };
+
+    vector<int> prod1 ={ 0, 1, 2, 3 };
+    vector<int> prod2 ={ 4, 1, 2, 3 };
+    vector<int> prod3 ={ 0, 5, 2, 3 };
+    vector<int> prod4 ={ 0, 6, 2, 3 };
+
     prod_bitset p1, p2, p3, p4;
     for (int i : prod1)
         p1.set(i);
@@ -763,14 +763,14 @@ void QueryCompiler::test()
         p3.set(i);
     for (int i : prod4)
         p4.set(i);
-    
+
     Aggregate* agg = new Aggregate();
-    agg->_agg = {p1, p2, p3, p4};
-    
+    agg->_agg ={ p1, p2, p3, p4 };
+
     Query* faq = new Query();
     faq->_rootID = 0;
-    faq->_aggregates = {agg};
-    
+    faq->_aggregates ={ agg };
+
     faq->_fVars.set(1);
     faq->_fVars.set(3);
 
@@ -790,17 +790,17 @@ void QueryCompiler::test()
     DINFO("Compiling Views \n");
 
     auto resultPair = compileViews(rootNode, rootNode->_id,
-                                   faq->_aggregates[0]->_agg, faq->_fVars);
-    
+        faq->_aggregates[0]->_agg, faq->_fVars);
+
     agg->_incoming.push_back(resultPair);
-    
+
     DINFO("Compiled Views - number of Views: "+to_string(_viewList.size())+"\n");
-    
+
     int viewID = 0;
     for (View* v : _viewList)
     {
         printf("%d (%s, %s): ", viewID++, _td->getRelation(v->_origin)->_name.c_str(),
-               _td->getRelation(v->_destination)->_name.c_str());
+            _td->getRelation(v->_destination)->_name.c_str());
         for (size_t i = 0; i < NUM_OF_VARIABLES; i++)
             if (v->_fVars.test(i))
                 printf(" %lu ", i);
@@ -817,7 +817,7 @@ void QueryCompiler::test()
 
         //         // cout << agg->_agg.size() << "aggIndex : " << aggIdx << endl;
         //         // cout << "prod : " << prod << endl;    
-              
+
         //         for (size_t f = 0; f < NUM_OF_FUNCTIONS; f++)
         //             if (prod.test(f))
         //                 aggString += " f_"+to_string(f);
@@ -834,14 +834,14 @@ void QueryCompiler::test()
 std::string QueryCompiler::genViewTreeOutput() {
     std::string jsonString = "{\n";
 
-    std::map<std::pair<int, int>, std::vector<size_t>> edgeList; 
-
+    std::map<std::pair<int, int>, std::vector<size_t>> edgeList;
 
     jsonString += offset(1)+"\"relations\": [\n";
     for (size_t rel = 0; rel < _td->numberOfRelations(); ++rel)
     {
-        TDNode* node = _td->getRelation(rel); 
-        jsonString += offset(2)+"{\"name\" : \""+node->_name+"\", \"id\" : "+std::to_string(node->_id)+"},\n";
+        TDNode* node = _td->getRelation(rel);
+        jsonString += offset(2)+"{name : \""+node->_name+"\", id : "+std::to_string(node->_id)+", output : false },\n";
+        // jsonString += offset(2)+"{name : \""+node->_name+"_out\", id : "+std::to_string(_td->numberOfRelations() + node->_id)+", output : true},\n";
     }
     jsonString += offset(1)+"],\n";
 
@@ -852,14 +852,13 @@ std::string QueryCompiler::genViewTreeOutput() {
     {
         View* view = _viewList[v];
 
-        std::pair<int, int> edge = std::make_pair(view->_origin, view->_destination); 
-        
-        auto it = edgeList.find(edge);
+        std::pair<int, int> edge = std::make_pair(view->_origin, view->_destination);
 
+        auto it = edgeList.find(edge);
         if (it != edgeList.end())
-            it->second.push_back(v);    
-        else 
-            edgeList[edge] = {v}; 
+            it->second.push_back(v);
+        else
+            edgeList[edge] ={ v };
 
         std::string groupByString = "";
         for (size_t attr = 0; attr < NUM_OF_VARIABLES; ++attr)
@@ -870,11 +869,70 @@ std::string QueryCompiler::genViewTreeOutput() {
 
         if (!groupByString.empty())
             groupByString.pop_back();
-        
+
+
+        TDNode& baseRelation = *(_td->getRelation(view->_origin));
+        size_t numberIncomingViews =
+            (view->_origin == view->_destination ? baseRelation._numOfNeighbors :
+                baseRelation._numOfNeighbors - 1);
+
+        std::string aggString = "";
+        for (size_t aggNum = 0; aggNum < view->_aggregates.size(); ++aggNum)
+        {
+            Aggregate* agg = view->_aggregates[aggNum];
+            
+            aggString += "\"SUM(";
+            size_t incOffset = 0;
+            for (size_t i = 0; i < agg->_agg.size(); i++)
+            {
+                const auto &prod = agg->_agg[i];
+                dyn_bitset incViewBitset(numberOfViews());
+
+                std::string viewAgg = "";
+                for (size_t j = 0; j < numberIncomingViews; ++j)
+                {
+                    const auto& incViewPair = agg->_incoming[incOffset+j];
+                    // Indicate that this view contributes to some aggregate
+                    incViewBitset[incViewPair.first] = 1;
+
+                    viewAgg += "V"+std::to_string(incViewPair.first)+".agg"+std::to_string(incViewPair.second)+"*";
+                }
+
+                if (!viewAgg.empty())
+                        viewAgg.pop_back();
+
+                std::string prodString = genProductString(baseRelation, incViewBitset, prod);
+
+                if (prodString.empty())
+                {
+                    if (!viewAgg.empty())
+                        aggString += viewAgg+"+";
+                    else 
+                        aggString += "1+";
+                }
+                else 
+                {
+                    if (!viewAgg.empty())
+                        aggString += prodString+"*"+viewAgg+"+";
+                    else 
+                        aggString += prodString+"+";
+                }
+            }
+
+            aggString.pop_back();
+            aggString += ") AS agg"+std::to_string(aggNum)+"\",";
+        }  
+        aggString.pop_back();
+
+        std::string joinString = "\""+baseRelation._name+"\"";
+        for (const size_t&  incView : view->_incomingViews)
+            joinString += ", \"V"+std::to_string(incView)+"\"";
+
         viewString += offset(2)+"{\n"+
             offset(2)+"\"name\" : \"V"+std::to_string(v)+"\",\n"+
             offset(2)+"\"groupby\" : ["+groupByString+"],\n"+
-            offset(2)+"\"aggregates\" : ["+groupByString+"],\n"+
+            offset(2)+"\"aggregates\" : ["+aggString+"],\n"+
+            offset(2)+"\"join\" : ["+joinString+"],\n"+
             offset(2)+"},\n";
     }
     viewString += offset(1)+"],";
@@ -882,14 +940,19 @@ std::string QueryCompiler::genViewTreeOutput() {
     // Generate Edges
     jsonString += offset(1)+"\"edges\": [\n";
 
-    for (const auto edge : edgeList )
+    for (const auto edge : edgeList)
     {
         std::string origin = _td->getRelation(edge.first.first)->_name;
         std::string dest = _td->getRelation(edge.first.second)->_name;
-        
-        jsonString += offset(2)+"{\n"+offset(2)+"\"origin\" : \""+origin+"\",\n"+
-            offset(2)+"\"dest\" : \""+dest+"\",\n"+
-            offset(2)+"\"views\" : [";
+
+        // if (origin != dest)
+            jsonString += offset(2)+"{\n"+offset(2)+"\"origin\" : \""+origin+"\",\n"+
+                offset(2)+"\"dest\" : \""+dest+"\",\n"+
+                offset(2)+"\"views\" : [";
+        // else 
+        //     jsonString += offset(2)+"{\n"+offset(2)+"\"origin\" : \""+origin+"\",\n"+
+        //         offset(2)+"\"dest\" : \""+dest+"_out\",\n"+
+        //         offset(2)+"\"views\" : [";
 
         for (const size_t& viewID : edge.second)
             jsonString += "\"V"+std::to_string(viewID)+"\",";
@@ -900,7 +963,7 @@ std::string QueryCompiler::genViewTreeOutput() {
 
     jsonString += offset(1)+"],\n";
 
-    jsonString += viewString+"\n"; 
+    jsonString += viewString+"\n";
 
     // Generate Queries
     jsonString += offset(1)+"\"queries\": [\n";
@@ -918,7 +981,7 @@ std::string QueryCompiler::genViewTreeOutput() {
 
         if (!groupByString.empty())
             groupByString.pop_back();
-        
+
         jsonString += offset(2)+"{\n"+
             offset(2)+"\"name\" : \"Q"+std::to_string(q)+"\",\n"+
             offset(2)+"\"groupby\" : ["+groupByString+"],\n"+
@@ -936,19 +999,18 @@ std::string QueryCompiler::genViewTreeOutput() {
         jsonString += offset(2)+"{\n"+
             offset(3)+"\"name\" : \"Group "+std::to_string(g)+"\",\n"+
             offset(3)+"\"base\" : \""+group._tdNode->_name+"\",\n"+
-            offset(3)+"\"views\" : ["; 
-        
+            offset(3)+"\"views\" : [";
+
         for (const size_t& view : group._views)
             jsonString += "\"V"+std::to_string(view)+"\",";
-        
+
         jsonString.pop_back();
-            
+
         jsonString += "]\n"+offset(2)+"},\n";
     }
     jsonString += offset(1)+"],\n";
 
     jsonString += offset(1)+"\"groupEdges\": [\n";
-
     for (size_t g = 0; g < viewGroups.size(); ++g)
     {
         ViewGroup& group = viewGroups[g];
@@ -957,13 +1019,13 @@ std::string QueryCompiler::genViewTreeOutput() {
 
         for (const size_t incView : group._incomingViews)
             incomingGroups.set(viewToGroupMapping[incView]);
-        
+
         for (size_t g2 = 0; g2 < viewGroups.size(); ++g2)
             if (incomingGroups[g2])
                 jsonString += offset(2)+"{\n"+
-                    offset(2)+"\"origin\" : \"Group "+std::to_string(g2)+"\",\n"+
-                    offset(2)+"\"dest\" : \"Group "+std::to_string(g)+"\",\n"+
-                    offset(2)+"},\n";
+                offset(2)+"\"origin\" : \"Group "+std::to_string(g2)+"\",\n"+
+                offset(2)+"\"dest\" : \"Group "+std::to_string(g)+"\",\n"+
+                offset(2)+"},\n";
     }
 
     jsonString += offset(1)+"]\n}\n";
@@ -971,7 +1033,10 @@ std::string QueryCompiler::genViewTreeOutput() {
     return jsonString;
 }
 
-std::string QueryCompiler::genViewGroupOutput() 
+
+
+
+std::string QueryCompiler::genViewGroupOutput()
 {
     std::string jsonString = "{\n";
 
@@ -982,26 +1047,26 @@ std::string QueryCompiler::genViewGroupOutput()
 
         jsonString += offset(2)+"{\n"+
             offset(3)+"\"name\" : \"Group "+std::to_string(g)+"\",\n"+
-            offset(3)+"\"views\" : ["; 
-        
+            offset(3)+"\"views\" : [";
+
         for (const size_t& view : group._views)
             jsonString += "V"+std::to_string(view)+",";
 
         jsonString.pop_back();
         jsonString += "],\n";
-        
-        jsonString += offset(3)+"\"incoming\" : ["; 
+
+        jsonString += offset(3)+"\"incoming\" : [";
         dyn_bitset incomingGroups(viewGroups.size());
         for (const size_t incView : group._incomingViews)
             incomingGroups.set(viewToGroupMapping[incView]);
-        
+
         for (size_t g = 0; g < viewGroups.size(); ++g)
             if (incomingGroups[g])
                 jsonString += "\"Group "+std::to_string(g)+"\",";
 
         if (incomingGroups.any())
             jsonString.pop_back();
-        
+
         jsonString += "]\n"+offset(2)+"},\n";
     }
 
@@ -1010,7 +1075,109 @@ std::string QueryCompiler::genViewGroupOutput()
     return jsonString;
 }
 
+
+
 void QueryCompiler::setQueryRoot(size_t qid, size_t newRootID)
 {
-    _queryList[qid]->_rootID = newRootID; 
+    _queryList[qid]->_rootID = newRootID;
+}
+
+
+
+std::string QueryCompiler::genProductString(
+    const TDNode& node, const dyn_bitset& contributingViews, const prod_bitset& product)
+{
+    std::string productString = "";
+    // Turn each function into string
+    for (size_t f = 0; f < NUM_OF_FUNCTIONS; f++)
+    {
+        if (product[f])
+        {
+            Function* function = getFunction(f);
+            const var_bitset& functionVars = function->_fVars;
+
+            std::string freeVarString = "";
+            for (size_t v = 0; v < NUM_OF_VARIABLES; ++v)
+            {
+                if (functionVars[v])
+                {
+                    if (node._bag[v])
+                    {
+                        freeVarString += node._name+"Tuple."+
+                            _td->getAttribute(v)->_name+",";
+                    }
+                    else
+                    {
+                        bool notFound = true;
+                        for (size_t incViewID = 0; incViewID <
+                            numberOfViews(); ++incViewID)
+                        {
+                            if (contributingViews[incViewID])
+                            {
+                                View* incView = getView(incViewID);
+                                if (incView->_fVars[v])
+                                {
+                                    freeVarString += "V"+std::to_string(incViewID)+"Tuple."+
+                                        _td->getAttribute(v)->_name+",";
+                                    notFound = false;
+                                    break;
+                                }
+                            }
+                        }
+                        if (notFound)
+                        {
+                            ERROR("The loop hasn't been found - THIS IS A MISTAKE\n");
+                            std::cout << node._name << std::endl;
+                            std::cout << product << std::endl;
+                            std::cout << _td->getAttribute(v)->_name << std::endl;
+                            exit(1);
+                        }
+                    }
+                }
+            }
+
+            freeVarString.pop_back();
+            productString += getFunctionString(function, freeVarString)+"*";
+        }
+    }
+
+    if (!productString.empty())
+        productString.pop_back();
+    // else
+    //     productString += "1";
+
+    return productString;
+}
+
+std::string QueryCompiler::getFunctionString(Function* f, std::string& fvars)
+{
+    switch (f->_operation)
+    {
+    case Operation::sum:
+        return fvars;
+    case Operation::linear_sum:
+        return fvars;
+    case Operation::quadratic_sum:
+        return fvars+"*"+fvars;
+    case Operation::cubic_sum:
+        return fvars+"*"+fvars+"*"+fvars;
+    case Operation::quartic_sum:
+        return fvars+"*"+fvars+"*"+fvars+"*"+fvars;
+    case Operation::lr_cont_parameter:
+        return "(0.15*"+fvars+")";
+    case Operation::lr_cat_parameter:
+        return "(0.15)";  // "_param["+fvars+"]"; // // TODO: THIS NEEDS TO BE A
+                          // CATEGORICAL PARAMETER - Index?!
+    case Operation::indicator_eq:
+        return "("+fvars+" == "+std::to_string(f->_parameter[0])+")"; // " ? 1 : 0)";
+    case Operation::indicator_lt:
+        return "("+fvars+" <= "+std::to_string(f->_parameter[0])+")"; // " ? 1 : 0)";
+    case Operation::indicator_neq:
+        return "("+fvars+" != "+std::to_string(f->_parameter[0])+")"; // " ? 1 : 0)";
+    case Operation::indicator_gt:
+        return "("+fvars+" > "+std::to_string(f->_parameter[0])+")";  // " ? 1 : 0)";
+    case Operation::dynamic:
+        return  f->_name+"("+fvars+")";
+    default: return "f("+fvars+")";
+    }
 }

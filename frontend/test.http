@@ -1,9 +1,14 @@
-http://localhost:8081/init/favorita,kmeans
+
+
+
+
+
+
+http://localhost:8081/init/retailer,kmeans
 
 ###
 
 http://localhost:8081/regen/0,1,2,1,3,2,2,3
-
 
 ###
 
@@ -12,3 +17,8 @@ http://localhost:8081/codegen/
 ###
 
 http://localhost:8081/runapp/
+
+
+### 
+
+http://localhost:8081/init/retailer,reg

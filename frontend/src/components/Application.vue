@@ -67,7 +67,7 @@
       </Col>
       <Col span=6>
         <h5>Relative Coreset Size</h5>
-        <Input width="12" :value="this.coresetSize" readonly style="margin-top: 20px; width: 150px">
+        <Input width="12" :value="applicationData.relativeCoresetSize" readonly style="margin-top: 20px; width: 150px">
          <span slot="append">%</span>
         </Input>
       </Col>
