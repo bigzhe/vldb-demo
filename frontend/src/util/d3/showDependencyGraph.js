@@ -73,6 +73,9 @@ export default function showDependencyGraph(originGraph, id, clickLinkCallBack, 
     .selectAll("line")
     .data(graph.groupEdges)
     .enter().append("line")
+    .attr("stroke", function (d) {
+      return "gray"
+    })
     .attr("stroke-width", function (d) {
       return d.weight * 2.5;
     })
@@ -101,9 +104,22 @@ export default function showDependencyGraph(originGraph, id, clickLinkCallBack, 
       .on("start", dragstarted)
       .on("drag", dragged)
       .on("end", dragended))
-    .on("click", function(d) {
+
+      node.on("click", function (d) {
         // console.log(d.id)
-        clickNodeCallBack(d.id, d.views)
+        clickNodeCallBack(d.id)
+        const thisNode = d.id
+    
+        node.select('circle').style("fill", function (d) {
+          return d.id == thisNode ? 'red' : 'white'
+        })
+    
+        node.style('fill', function (d) {
+          return d.id == thisNode ? 'white' : 'black'
+        })
+    
+        link.attr("stroke", 'gray')
+    
       })
 
   node.append('text')
