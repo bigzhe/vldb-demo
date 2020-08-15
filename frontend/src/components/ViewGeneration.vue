@@ -121,6 +121,11 @@ export default class Dataset extends Vue {
   relationClicked(relationId: string) {
     console.log({ relationId });
     this.selectedRelation = relationId;
+    this.selectedEdge =
+      this.joinTreeD3.selfLinks.find(
+        (edge) => edge.source == relationId && edge.target == relationId
+      ) || dumbEdge;
+    console.log(this.selectedEdge);
   }
 
   transitionClicked(source: string, target: string) {
@@ -179,6 +184,10 @@ export default class Dataset extends Vue {
 }
 
 #joinTree .links line {
+  cursor: pointer;
+}
+
+#joinTree .nodes circle {
   cursor: pointer;
 }
 

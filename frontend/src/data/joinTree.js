@@ -19,6 +19,14 @@ const generateJoinTreeD3 = mockJoinTree => {
         output: relation.output
       }
     }),
+    selfLinks: mockJoinTree.edges.filter(edge => edge.origin == edge.dest).map(edge => {
+      return {
+        weight: edge.views.length,
+        views: edge.views,
+        source: edge.origin,
+        target: edge.dest,
+      }
+    }),
     links: mockJoinTree.edges.filter(edge => edge.origin !== edge.dest).map(edge => {
       return {
         weight: edge.views.length,
