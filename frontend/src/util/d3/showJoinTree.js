@@ -73,14 +73,30 @@ export default function showJoinTree(originGraph, id, clickLinkCallBack, clickNo
     .selectAll("line")
     .data(graph.links)
     .enter().append("line")
+    .attr("stroke", function (d) {
+      return "gray"
+    })
     .attr("stroke-width", function (d) {
       return d.weight * 2.5;
     })
     .attr("marker-end", "url(#end)")
-    .on("click", function(d) {
-      // console.log(d.source.id, d.target.id)
-      clickLinkCallBack(d.source.id, d.target.id)
+
+
+
+  link.on("click", function (d) {
+    // console.log(d.source.id, d.target.id)
+    clickLinkCallBack(d.source.id, d.target.id)
+
+    var thisNode = d
+    // var connected = data.links.filter(function (e) {
+    //   return e.source === thisNode || e.target === thisNode
+    // });
+
+    link.attr("stroke", function (d) {
+      return (d.source.id == thisNode.source.id && d.target.id == thisNode.target.id) ? 'red' : 'gray'
     })
+
+  })
 
 
 
@@ -89,7 +105,7 @@ export default function showJoinTree(originGraph, id, clickLinkCallBack, clickNo
     .selectAll("g")
     .data(graph.nodes)
     .enter().append("g")
-    
+
 
   var circles = node.append("circle")
     .attr("r", function (d) {
@@ -101,10 +117,12 @@ export default function showJoinTree(originGraph, id, clickLinkCallBack, clickNo
       .on("start", dragstarted)
       .on("drag", dragged)
       .on("end", dragended))
-    .on("click", function(d) {
-        // console.log(d.id)
-        clickNodeCallBack(d.id)
-      })
+    .on("click", function (d) {
+      // console.log(d.id)
+      clickNodeCallBack(d.id)
+
+
+    })
 
   node.append('text')
     .attr('text-anchor', 'middle')
@@ -126,18 +144,18 @@ export default function showJoinTree(originGraph, id, clickLinkCallBack, clickNo
 
 
   // the functions for computing the point that a link intersects the circle it points to
-  
+
   var lineX2 = function (d) {
-      var length = Math.sqrt(Math.pow(d.target.y - d.source.y, 2) + Math.pow(d.target.x - d.source.x, 2));
-      var scale = (length - NODE_RADIUS) / length;
-      var offset = (d.target.x - d.source.x) - (d.target.x - d.source.x) * scale;
-      return d.target.x - offset;
+    var length = Math.sqrt(Math.pow(d.target.y - d.source.y, 2) + Math.pow(d.target.x - d.source.x, 2));
+    var scale = (length - NODE_RADIUS) / length;
+    var offset = (d.target.x - d.source.x) - (d.target.x - d.source.x) * scale;
+    return d.target.x - offset;
   };
   var lineY2 = function (d) {
-      var length = Math.sqrt(Math.pow(d.target.y - d.source.y, 2) + Math.pow(d.target.x - d.source.x, 2));
-      var scale = (length - NODE_RADIUS) / length;
-      var offset = (d.target.y - d.source.y) - (d.target.y - d.source.y) * scale;
-      return d.target.y - offset;
+    var length = Math.sqrt(Math.pow(d.target.y - d.source.y, 2) + Math.pow(d.target.x - d.source.x, 2));
+    var scale = (length - NODE_RADIUS) / length;
+    var offset = (d.target.y - d.source.y) - (d.target.y - d.source.y) * scale;
+    return d.target.y - offset;
   };
 
   // 
@@ -153,7 +171,7 @@ export default function showJoinTree(originGraph, id, clickLinkCallBack, clickNo
       .attr("x2", lineX2)
       .attr("y2", lineY2)
       .attr('transform', function (d) {
-        
+
         // add shifts to the parallel lines
         var rightwardSign = d.target.x > d.source.x ? 1 : -1;
         var translation = calcTranslationExact(rightwardSign * 6, d.source, d.target);

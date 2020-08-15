@@ -135,20 +135,3 @@ export default class Dataset extends Vue {
 }
 </script>
 
-<style scoped>
-.links line {
-  stroke: #999;
-  stroke-opacity: 0.8;
-}
-
-.nodes circle {
-  stroke: #fff;
-  stroke-width: 1.5px;
-  cursor: pointer;
-}
-
-text {
-  font-family: sans-serif;
-  font-size: 10px;
-}
-</style>

@@ -33,7 +33,7 @@
             <hr style="margin-top: 5px; margin-bottom: 5px;" />
             <Tree :data="intermediateViews"></Tree>
           </div>
-          <div v-else>Click the arrows to inspect the intermediate views</div>
+          <div v-else>Click arrows and nodes to inspect the intermediate views</div>
         </div>
       </Col>
     </Row>
@@ -134,6 +134,7 @@ export default class Dataset extends Vue {
         (edge) => edge.source == source && edge.target == target
       ) || dumbEdge;
     console.log(this.selectedEdge);
+
   }
 
   handleContextMenu(data: any) {
@@ -179,7 +180,7 @@ export default class Dataset extends Vue {
 }
 
 .links line {
-  stroke: #999;
+  /* stroke: #999; */
   stroke-opacity: 0.6;
 }
 

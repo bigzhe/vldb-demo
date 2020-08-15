@@ -175,23 +175,3 @@ export default class Dataset extends Vue {
 }
 </script>
 
-<style >
-.ivu-form-item {
-  margin-bottom: 0px;
-}
-
-.links line {
-  stroke: #999;
-  stroke-opacity: 0.6;
-}
-
-.nodes circle {
-  stroke: #fff;
-  stroke-width: 1.5px;
-}
-
-text {
-  font-family: sans-serif;
-  font-size: 10px;
-}
-</style>
