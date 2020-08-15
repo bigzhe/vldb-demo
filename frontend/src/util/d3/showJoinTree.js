@@ -84,17 +84,22 @@ export default function showJoinTree(originGraph, id, clickLinkCallBack, clickNo
 
 
   link.on("click", function (d) {
-    // console.log(d.source.id, d.target.id)
     clickLinkCallBack(d.source.id, d.target.id)
 
     var thisNode = d
-    // var connected = data.links.filter(function (e) {
-    //   return e.source === thisNode || e.target === thisNode
-    // });
 
     link.attr("stroke", function (d) {
       return (d.source.id == thisNode.source.id && d.target.id == thisNode.target.id) ? 'red' : 'gray'
     })
+
+    node.select('circle').style("fill", function (d) {
+      return 'white'
+    })
+
+    node.style('fill', function (d) {
+      return 'black'
+    })
+
 
   })
 
@@ -117,12 +122,24 @@ export default function showJoinTree(originGraph, id, clickLinkCallBack, clickNo
       .on("start", dragstarted)
       .on("drag", dragged)
       .on("end", dragended))
-    .on("click", function (d) {
-      // console.log(d.id)
-      clickNodeCallBack(d.id)
 
 
+  node.on("click", function (d) {
+    // console.log(d.id)
+    clickNodeCallBack(d.id)
+    const thisNode = d.id
+
+    node.select('circle').style("fill", function (d) {
+      return d.id == thisNode ? 'red' : 'white'
     })
+
+    node.style('fill', function (d) {
+      return d.id == thisNode ? 'white' : 'black'
+    })
+
+    link.attr("stroke", 'gray')
+
+  })
 
   node.append('text')
     .attr('text-anchor', 'middle')
